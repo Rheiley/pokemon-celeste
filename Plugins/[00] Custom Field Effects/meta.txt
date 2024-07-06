@@ -1,0 +1,36 @@
+Name         = Custom Field Effects
+Version      = 1.0.6
+Essentials   = 21.1
+Website      = https://space.bilibili.com/237839484
+Credits      = Penelope
+
+#==============================================================='
+#
+# 1.0.6
+# - Delete some unused stuff
+# - Some small changes
+#
+# 1.0.5
+# - Huge changes
+# - Add some Fields (only basic function)
+# 
+# 1.0.4
+# - Add Misty Field effect (06)
+# - Add Psychic Field effect (08)
+#
+# 1.0.3
+# - Add Grassy Field effect (04)
+#
+# 1.0.2
+# - Add more controls
+# - Rename some scripts
+# - Separate terrain effect and field effect
+# - Add Electric Field effect (02)
+#
+# 1.0.1
+# - Link all field effects to battle background (image resources from Reborn)
+#
+# 1.0.0
+# - Create plugin
+# - Create field notes
+# - All origin terrain effects done (00 / 01 / 03 / 05 / 07)

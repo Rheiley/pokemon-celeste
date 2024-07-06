@@ -1,0 +1,459 @@
+[ FIELD ]
+None                        = 00 Done
+Electric Terrain            = 01 Done
+Grassy Terrain              = 02 Done
+Misty Terrain               = 03 Done
+Psychic Terrain             = 04 Done
+Electric Field              = 05 Done
+Grassy Field                = 06 Done
+Misty Field                 = 07 Done
+Psychic Field               = 08
+Inverse Field               = 09
+Rocky Field                 = 10
+
+Corrosive Field             = 11
+Corrosive Mist Field        = 12
+
+Dark Crystal Cavern         = 05
+Chess Board                 = 06 Chess Field Chess Arena
+Big Top Arena               = 07
+Volcanic Field              = 08 Burning Field
+Swamp Field                 = 09
+Rainbow Field               = 10
+Desert Field                = 13
+Icy Field                   = 14
+Rocky Field                 = 15
+Forest Field                = 16
+Volcanic Top Field          = 17 Superheated Field
+Factory Field               = 18
+Short-Circuit Field         = 19
+Wasteland                   = 20
+Ashen Beach                 = 21
+Water Surface               = 22
+Underwater                  = 23
+Cave                        = 24
+Glitch Field                = 25
+Crystal Cavern              = 26
+Murkwater Surface           = 27
+Mountain                    = 28
+Snowy Mountain              = 29
+Blessed Field               = 30 Holy Field
+Mirror Arena                = 31
+Fairy Tale Field            = 32
+Dragon's Den                = 33
+Flower Garden Field         = 34
+Starlight Arena             = 35
+New World                   = 36
+Dimensional Field           = 38
+Frozen Dimensional Field    = 39
+Haunted Field               = 40
+Corrupted Cave              = 41
+Bewitched Woods             = 42
+Sky Field                   = 43
+Colosseum Field             = 44
+Infernal Field              = 45
+Darkness Field              = 46
+Cloud Field                 = 47
+Crowd Field                 = 48
+Dance Floor Field           = 49
+Fallout Field               = 50
+Distortion World            = 51
+Galactic Universe Field     = 52
+------------------------------------------------------------------
+01 			   Electric Terrain
+------------------------------------------------------------------
+"An electric current is running across the battlefield!"
+
+Grounded Pokemon cannot fall asleep
+
+ABILITY:
+These abilities are activated:
+Surge Surfer
+Hadron Engine # Gen 9 Pack (change Electric to ElectricTerrain)
+Quark Drive # Gen 9 Pack (change check to [:ElectricTerrain, :ElectricField].include?(battle.field.terrain))
+
+Mimicry changes the user's type to Electric
+
+MOVE:
+Electric moves from grounded Pokemon increase in base power x1.3
+
+These moves power are changed:
+x1.5   Psyblade # Gen 9 Pack (change Electric to ElectricTerrain)
+x2     Rising Voltage / Terrain Pulse
+
+These move effects changed:
+Terrain Pulse becomes Electric move
+Nature Power becomes Thunderbolt
+Secret Power may Paralyze
+Camouflage changes the user's type to Electric
+
+These following items are affected:
+Electric Seed boosts Def
+
+Created by: Electric Surge / Hadron Engine / Electric Terrain
+End by:     Defog / Steel Roller / Ice Spinner
+------------------------------------------------------------------
+02 			   Grassy Terrain
+------------------------------------------------------------------
+"Grass is covering the battlefield!"
+
+Grounded Pokemon restore 1/16 max hp at the end of the turn
+
+ABILITY:
+These abilities are activated:
+Grass Pelt
+
+Mimicry changes the user's type to Grass
+
+MOVE:
+Grass moves from grounded Pokemon increase in base power x1.3
+
+These moves power are changed:
+x0.5   Bulldoze / Earthquake / Magnitude
+x2     Terrain Pulse
+
+These moves effect changed:
+Terrain Pulse becomes Grass move
+Nature Power becomes Energy Ball
+Secret Power may Sleep
+Camouflage changes the user's type to Grass
+Grassy Glide becomes a priority move (+1)
+Floral Healing restores 2/3 max hp
+
+These following items are affected:
+Grassy Seed boosts Def
+
+Created by: Grassy Surge / Seed Sower / Grassy Terrain
+End by:     Defog / Steel Roller / Ice Spinner
+------------------------------------------------------------------
+03 			   Misty Terrain
+------------------------------------------------------------------
+"Mist swirls about the battlefield!"
+
+Grounded Pokemon are immune to status conditions, yawn and confusion
+
+ABILITY:
+Mimicry changes the user's type to Fairy
+
+MOVE:
+Dragon moves against grounded Pokemon decrease in base power x0.5
+
+These moves power are changed: 
+x1.5   Misty Explosion
+x2     Terrain Pulse
+
+These moves effect changed:
+Terrain Pulse becomes Fairy move
+Nature Power becomes Mist Ball
+Secret Power may lower Sp.Atk
+Camouflage changes the user's type to Fairy
+
+These following items are affected:
+Misty Seed boosts Sp.Def
+
+Created by: Misty Surge / Misty Terrain
+End by:     Defog / Steel Roller / Ice Spinner
+------------------------------------------------------------------
+04			   Psychic Terrain
+------------------------------------------------------------------
+"The battlefield is weird!"
+
+Priority attacks fail on grounded Pokemon
+
+ABILITY:
+Mimicry changes the user's type to Psychic
+
+MOVE:
+Psychic moves from grounded Pokemon increase in base power x1.3
+
+These moves power are changed:
+x1.5   Expanding Force 
+x2     Terrain Pulse 
+
+These moves effect changed:
+Terrain Pulse becomes Psychic move
+Nature Power becomes Psychic
+Secret Power may lower Speed
+Camouflage changes the user's type to Psychic
+Expanding Force hits both opposing Pokemon in a double battle
+						
+These following items are affected:
+Psychic Seed boosts Sp.Def
+
+Created by: Psychic Surge / Psychic Terrain
+End by:     Defog / Steel Roller / Ice Spinner
+------------------------------------------------------------------
+05 			   Electric Field
+------------------------------------------------------------------
+"The Field is hyper-charged!"
+
+Grounded Pokemon cannot fall asleep
+Non-Electric type Grounded Pokemon that doesn't have Lightning Rod / Motor Drive / Volt Absorb reduce 1/16 max hp at the end of the turn when the weather is Rain or Heavy Rain
+Electric type moves will super effective on Ground type Pokemon when the weather is Rain or Heavy Rain
+
+ABILITY:
+These abilities are activated:
+Surge Surfer
+Hadron Engine # Gen 9 Pack (change Electric to ElectricTerrain)
+Quark Drive # Gen 9 Pack (change check to [:ElectricTerrain, :ElectricField].include?(battle.field.terrain))
+
+Galvanize boosts attacks to 1.5 instead of 1.2
+Comatose is disabled
+Gulp Missile always picks up Pikachu
+Mimicry changes the user's type to Electric
+
+MOVE:
+Electric moves from grounded Pokemon increase in base power x1.3
+Electric moves from grounded Pokemon have a 30% chance of paralyzing
+Electric moves against paralyzed grounded Pokemon increase in base power x1.3
+
+Moves power from these Pokemon are changed:
+x1.5 Zapdos
+x2 Magnemite
+
+These moves power are changed:
+x1.3   Explosion / Self-Destruct / Surf / Muddy Water / Hurricane / Smack Down / Thousand Arrows 
+x1.5   Psyblade # Gen 9 Pack
+x2     Rising Voltages / Terrain Pulse / Magnet Bomb / Plasma Fists
+
+These move effects changed:
+Terrain Pulse becomes Electric move
+Nature Power becomes Thunderbolt
+Secret Power may Paralyze
+Camouflage changes the user's type to Electric
+Magnet Rise lasts for 8 turns
+Focus Punch will always fail
+
+The stat-changing effect of these moves is enahnced:
+Charge / Eerie Impulse
+
+These moves deal additional Electric type damage:
+Explosion / Self-Destruct / Surf / Muddy Water / Hurricane / Smack Down / Thousand Arrows
+
+These following items are affected:
+Electric Seed boosts Def and applies to Charge to the battler
+
+Created by: Ion Deluge / Plasma Fists
+End by:     Mud Sport
+------------------------------------------------------------------
+06 			   Grassy Field
+------------------------------------------------------------------
+"The field is in full bloom!"
+
+Grounded Pokemon restore 1/16 max hp at the end of the turn
+
+ABILITY:
+These abilities are activated:
+Grass Pelt
+
+Mimicry changes the user's type to Grass
+Sap Sipper heals 1/16 max hp at the end of the turn
+Cotton Down lowers speed by two stages
+
+MOVE:
+Grass moves from grounded Pokemon increase in base power x1.5
+Fire moves against grounded Pokemon increase in base power x1.5
+
+These moves power are changed:
+x0.5   Bulldoze / Earthquake / Magnitude / Muddy Water / Surf
+x1.5   Fairy Wind / Silver Wind
+x2     Terrain Pulse
+
+The base accuracy of these moves changed:
+80   Grass Whistle
+
+These moves effect changed:
+Terrain Pulse becomes Grass move
+Nature Power becomes Energy Ball
+Secret Power may induce Sleep
+Camouflage changes the user's type to Grass
+Grassy Glide becomes a priority move (+1)
+Floral Healing restores 2/3 max hp
+Snap Trap deals 1/6 max hp damage per turn
+Nature's Madness deals 75% hp damage
+Ingrain restores 1/8 max hp at the end of the turn
+
+The stat-changing effect of these moves is enahnced:
+Growth / Coil
+
+These following items are affected:
+Grassy Seed boosts Def and applies Ingrain to the battler
+
+Created by:   Magical Leaf
+End by:       Flame Wheel / Sludge Wave(Corrosive Field)
+------------------------------------------------------------------
+07 			   Misty Field
+------------------------------------------------------------------
+Mist is surrounding the field!
+
+Grounded Pokemon are immune to status conditions, yawn and confusion
+Grounded Fairy type Pokemon's Sp.Def increases x1.5
+
+ABILITY:
+These abilities are activated:
+Marvel Scale
+
+Mimicry changes the user's type to Fairy
+Soul Heart additionally boosts Sp.Def
+Dry Skin heals 1/16 max hp at the end of the turn
+Pixilate's base power boost becomes x1.5
+Pastel Veil halves the damage taken from Poison Type attacks for user and allies
+
+MOVE:
+Dragon moves against grounded Pokemon decrease in base power x0.5
+Fairy moves from grounded Pokemon increase in base power x1.5
+
+These moves power are changed: 
+x0.5   Dark Pulse / Night Daze / Shadow Ball
+x1.5   Misty Explosion / Mystical Fire / Magical Leaf / Doom Desire / Hidden Power
+       Icy Wind / Aura Sphere / Mist Ball / Steam Eruption / Clear Smog
+       Smog / Silver Wind / Strange Steam / Moongeist Beam
+x2     Terrain Pulse
+
+The base accuracy of these moves changed:
+100   Sweet Kiss
+
+These moves effect changed:
+Terrain Pulse becomes Fairy move
+Nature Power becomes Mist Ball
+Secret Power may lower Sp.Atk
+Camouflage changes the user's type to Fairy
+Sweet Scent lowers Def and Sp.Def additionally
+Wish restores 75% of the user's max hp
+Aqua Ring restores 1/8 max hp each turn
+Prevents use of Self-Destruct
+Prevents use of Explosion
+
+The stat-changing effect of these moves is enahnced:
+Cosmic Power / Aromatic Mist
+
+These following items are affected:
+Misty Seed boosts Sp.Def and applies Healing Wish to the user
+
+Created by: Mist
+End by:     Whirlwind / Gust / Razor Wind / Hurricane / Defog / Tailwind / Twister
+            Clear Smog(Corrosive Field) / Smog(Corrosive Field) / Poison Gas(Corrosive Field)
+------------------------------------------------------------------
+08			   Psychic Field
+------------------------------------------------------------------
+"The field feels confusing!"
+
+Priority attacks fail on grounded Pokemon
+
+ABILITY:
+Mimicry changes the user's type to Psychic
+Pure Power doubles Sp.Atk instead of Atk*
+Anticipation boost Sp.Atk on switch in*
+Forewarn boost Sp.Atk on switch in*
+Power Spot increases partner's damage output by x1.5*
+Magician additionally lowers the accuracy of status moves targeted to the user to 50%*
+Telepathy Pokemon's Speed doubles*
+
+MOVE:
+Psychic moves from grounded Pokemon increase in base power x1.5
+
+These moves power are changed: 
+x1.5   Mystical Fire / Magical Leaf / Aura Sphere / Hex / Moonblast / Mind Blown / Expanding Force
+x2     Terrain Pulse
+
+The base accuracy of these moves changed:
+90   Hypnosis
+
+These moves effect changed:
+Terrain Pulse becomes Psychic move
+Nature Power becomes Psychic
+Secret Power may lower Speed
+Camouflage changes the user's type to Psychic
+Expanding Force hits both opposing Pokemon in a double battle
+Gravity last 8 turns*
+Trick Room last 8 turns*
+Magic Room last 8 turns*
+Wonder Room last 8 turns*
+
+The stat-changing effect of these moves is enahnced:*
+Nasty Plot / Calm Mind / Comsic Power / Meditate / Kinesis / Mind Reader / Psych Up / Miracle Eye
+
+These moves deal additional Psychic type damage:*
+Strength / Ancient Power / Dragon Pulse / Water Pulse
+
+These following items are affected:*
+Psychic Seed boosts Sp.Def and Sp.Atk and confuses the user
+
+Created by:   Psywave
+End by:       Crunch
+------------------------------------------------------------------
+09			   Inverse Field
+------------------------------------------------------------------
+"!trats elttaB"
+
+The type chart is inverted
+
+ABILITY:
+Mimicry changes the user's type to Normal*
+Normalize's base power boost becomes x1.5
+
+MOVE:
+Normal moves from grounded Pokemon increase in base power x1.5
+
+These moves effect changed:
+Nature Power becomes Trick Room*
+Camouflage changes the user's type to Normal*
+Secret Power may inflict confusion*
+
+These following items are affected:
+Magical Seed changes the user's type to Normal and gives them Normalize*
+
+Created by:   Wonder Room
+End by:       Magic Room
+------------------------------------------------------------------
+10			   Rocky Field
+------------------------------------------------------------------
+"The field is littered with rocks!"
+
+Priority attacks fail on grounded Rock type Pokemon
+Sandstorm damage is doubled
+
+ABILITY:
+Mimicry changes the user's type to Rock
+Long Reach drops accuracy by x0.9
+Sand Stream heals 1/16 max hp at the end of the turn
+Weak Armor doesn't lower defense stat
+Sand Veil evasion rate increased to 30% in sandstorm
+Rock Head Pokemon gains status immunity
+Sturdy Pokemon Pokemon gains stat loss immunity
+Defeatist always deactivate
+Shell Armor Pokemon attacked by a contact move will make attacker lose 1/8 max hp
+Battle Armor Pokemon attacked by a contact move will make attacker lose 1/8 max hp
+
+MOVE:
+Rock moves from grounded Pokemon increase in base power x1.3
+Rock moves from grounded Pokemon decrease Accuracy on non-Rock type Pokemon when the weather is Sandstorm
+
+Moves power from these Pokemon are changed:
+x1.2 Aerodacty
+
+These moves power are changed:
+x2 Terrain Pulse / Rock Smash
+
+These moves effect changed:
+Terrain Pulse becomes Rock move
+Nature Power becomes Rock Smash
+Secret Power may Flinch
+Camouflage changes the user's type to Rock
+Stealth Rock damage rate increased to 1/7
+
+The base accuracy of these moves changed:
+90 Stone Edge / Head Smash
+95 Rock Throw / Rock Slide / Rollout / Rock Blast
+100 Rock Tomb / Diamond Storm / Meteor Beam / tone Axe
+
+The stat-changing effect of these moves is enahnced:
+Rock Polish
+
+These moves change to Rock type:
+Earthquake / Magnitude / Rock Climb / Strength / Bulldoze / Headbutt
+
+These following items are affected:
+
+Created by: Sandstorm
+End by:
