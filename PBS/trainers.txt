@@ -1,4 +1,57 @@
-﻿# See the documentation on the wiki to learn how to edit this file.
+﻿# Trainer Categories:
+# Test
+# Rivals
+# Major Battles (in order of first appearance)
+# Venus Grunts
+# Sidequest Battles
+# Generic Trainers
+
+#-------------------------------
+#			 Test
+#-------------------------------
+
+
+
+#-------------------------------
+#			Rivals
+#-------------------------------
+
+#-------------------------------
+[RIVAL_Aki,Aki]
+LoseText = Hey you're pretty good!
+Pokemon = GROWLITHE, 5
+	Nature = NAIVE
+	AbilityIndex = 0
+	Gender = male
+    IV = 31
+	EV = 4,252,0,0,0,252
+#-------------------------------
+[RIVAL_Riley,Riley]
+LoseText = Hmph. Not bad I guess.
+Pokemon = NIDORANfE, 5
+	Moves = TOXICSPIKES
+	Nature = ADAMANT
+	AbilityIndex = 0
+    IV = 31
+	EV = 4,252,0,0,0,252
+#-------------------------------
+
+#-------------------------------
+#	     Major Battles
+#-------------------------------
+
+#-------------------------------
+#	     Venus Grunts
+#-------------------------------
+
+#-------------------------------
+#	   Sidequest Battles
+#-------------------------------
+
+#-------------------------------
+#	   Generic Trainers
+#-------------------------------
+
 #-------------------------------
 [CAMPER,Liam]
 LoseText = A very good battle, indeed!
@@ -117,17 +170,4 @@ Pokemon = CHARIZARD,63
 Pokemon = BLASTOISE,63
     Item = SITRUSBERRY
 #-------------------------------
-[RIVAL_Aki,Aki]
-LoseText = Hey you're pretty good!
-Pokemon = GROWLITHE, 5
-	Gender = male
-    IV = 31
-	EV = 4,252,0,0,0,252
-#-------------------------------
-[RIVAL_Riley,Riley]
-LoseText = Hmph. Not bad I guess.
-Pokemon = NIDORANfE, 5
-	Gender = female
-    IV = 31
-	EV = 4,252,0,0,0,252
 

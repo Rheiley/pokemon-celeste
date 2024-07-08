@@ -52,6 +52,11 @@ class Battle::Move
 	modifiers[:base_accuracy] == 100
 	@battle.pbDisplay(_INTL("The rock leads the attack on {1}!", target.pbThis))
 	end
+#============================================================================= 11
+	if [:CorrosiveField].include?(@battle.field.terrain) &&
+		[:POISONPOWDER, :SLEEPPOWDER, :STUNSPORE, :TOXIC].include?(@id)
+		modifiers[:base_accuracy] = 100
+	end
 #=============================================================================
     # Calculation
     max_stage = Battle::Battler::STAT_STAGE_MAXIMUM

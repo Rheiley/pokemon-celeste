@@ -24,13 +24,13 @@ class Battle::Move
   alias fieldEffects_pbCalcTypeModSingle pbCalcTypeModSingle
   def pbCalcTypeModSingle(moveType, defType, user, target)
     ret = fieldEffects_pbCalcTypeModSingle(moveType, defType, user, target)
-#=============================================================================
+#============================================================================= Electric Field
 	if [:ElectricField].include?(@battle.field.terrain) &&
        [:EXPLOSION, :SELFDESTRUCT, :SURF, :MUDDYWATER, :HURRICANE, :SMACKDOWN, :THOUSANDARROWS].include?(@id) && 
 	   GameData::Type.exists?(:ELECTRIC)
        ret += Effectiveness.calculate(:ELECTRIC, defType)
     end
-#=============================================================================
+#============================================================================= 
 =begin	
 	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # multiply type effectiveness cal
        ret *= Effectiveness.calculate(:WATER, defType)
@@ -42,7 +42,7 @@ class Battle::Move
        ret = Effectiveness.calculate(:WATER, defType)
     end
 =end
-#=============================================================================
+#============================================================================= Electric Terrain
 	if [:ElectricTerrain, :ElectricField].include?(@battle.field.terrain) &&
 	   [:Rain, :HeavyRain].include?(target.effectiveWeather) && defType == :GROUND && moveType == :ELECTRIC
 	   ret = Effectiveness::SUPER_EFFECTIVE_MULTIPLIER # Electric Attack Ground Type Rain
@@ -50,7 +50,7 @@ class Battle::Move
        ret = Effectiveness::NOT_VERY_EFFECTIVE_MULTIPLIER
 	   end
 	end
-#=============================================================================
+#============================================================================= Inverse Field
     if Effectiveness.ineffective_type?(moveType, defType)
 	  if [:InverseField].include?(@battle.field.terrain) # Inverse Battle 0→2
 	  ret = Effectiveness::SUPER_EFFECTIVE_MULTIPLIER
@@ -64,6 +64,12 @@ class Battle::Move
 	  ret = Effectiveness::SUPER_EFFECTIVE_MULTIPLIER
 	  end	      
     end
+
+#============================================================================= Corrosive Field
+	if [:CorrosiveField].include?(@battle.field.terrain) &&
+	   [:VENOSHOCK].include?(@id)
+		power = 130
+	end
 #=============================================================================
 #=============================================================================
     return ret

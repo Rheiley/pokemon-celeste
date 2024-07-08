@@ -58,6 +58,14 @@ Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
   }
 )
 
+# Toxic Boost
+Battle::AbilityEffects::OnSwitchIn.add(:TOXICBOOST,
+  proc { |ability, battler, battle, switch_in|
+	next if [:CorrosiveField].include?(battle.field.terrain)
+	battle.pbDisplay(_INTL("{1}'s Toxic Boost activated!", battler.pbThis))
+  }
+)
+
 # Gulp Missile
 Battle::AbilityEffects::OnEndOfUsingMove.add(:GULPMISSILE,
   proc { |ability, user, targets, move, battle|
@@ -351,7 +359,8 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
 		:MistyField      => :FAIRY,
         :PsychicTerrain  => :PSYCHIC,
 		:PsychicField    => :PSYCHIC,
-		:RockyField      => :Rock
+		:RockyField      => :ROCK,
+		:CorrosiveField	 => :POISON
       }
       new_type = terrain_hash[battle.field.terrain]
       new_type_name = nil

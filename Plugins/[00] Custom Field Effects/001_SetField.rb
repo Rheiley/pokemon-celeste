@@ -12,8 +12,8 @@ GameData::BattleTerrain.register({:id => :MistyField,         :name => _INTL("Mi
 GameData::BattleTerrain.register({:id => :PsychicField,       :name => _INTL("PsychicField")})       # 08 Psychic Field
 GameData::BattleTerrain.register({:id => :InverseField,       :name => _INTL("InverseField")})       # 09 Inverse Field
 GameData::BattleTerrain.register({:id => :RockyField,         :name => _INTL("RockyField")})         # 10 Rocky Field
-GameData::BattleTerrain.register({:id => :CorrosiveField,     :name => _INTL("CorrosiveField")})     # 1
-GameData::BattleTerrain.register({:id => :CorrosiveMistField, :name => _INTL("CorrosiveMistField")}) # 1
+GameData::BattleTerrain.register({:id => :CorrosiveField,     :name => _INTL("CorrosiveField")})     # 11 Corrosive Field
+GameData::BattleTerrain.register({:id => :CorrosiveMistField, :name => _INTL("CorrosiveMistField")}) # 12 Corrosive Mist Field
 
 #===============================================================================
 # Field Note
@@ -21,30 +21,34 @@ GameData::BattleTerrain.register({:id => :CorrosiveMistField, :name => _INTL("Co
 class Battle 
  def pbFieldStartMessage
     case @field.terrain
-    when :ElectricTerrain then pbDisplay(_INTL("An electric current is running across the battlefield!")) # 01
-	when :GrassyTerrain   then pbDisplay(_INTL("Grass is covering the battlefield!"))                     # 02
-    when :MistyTerrain    then pbDisplay(_INTL("Mist swirls about the battlefield!"))	                  # 03
-    when :PsychicTerrain  then pbDisplay(_INTL("The battlefield is weird!"))                              # 04
-    when :ElectricField   then pbDisplay(_INTL("The field is hyper-charged!"))                            # 05
-    when :GrassyField     then pbDisplay(_INTL("The field is in full bloom!"))                            # 06
-    when :MistyField      then pbDisplay(_INTL("Mist settles on the field!"))                             # 07
-    when :PsychicField    then pbDisplay(_INTL("The field became mysterious!"))                           # 08
-	when :InverseField    then pbDisplay(_INTL("!trats elttaB"))                                          # 09
-	when :RockyField      then pbDisplay(_INTL("The field is littered with rocks!"))                      # 10
+    when :ElectricTerrain         then pbDisplay(_INTL("An electric current is running across the battlefield!")) # 01
+	when :GrassyTerrain           then pbDisplay(_INTL("Grass is covering the battlefield!"))                     # 02
+    when :MistyTerrain            then pbDisplay(_INTL("Mist swirls about the battlefield!"))	                  # 03
+    when :PsychicTerrain          then pbDisplay(_INTL("The battlefield is weird!"))                              # 04
+    when :ElectricField           then pbDisplay(_INTL("The field is hyper-charged!"))                            # 05
+    when :GrassyField             then pbDisplay(_INTL("The field is in full bloom!"))                            # 06
+    when :MistyField              then pbDisplay(_INTL("Mist settles on the field!"))                             # 07
+    when :PsychicField            then pbDisplay(_INTL("The field became mysterious!"))                           # 08
+	when :InverseField    		  then pbDisplay(_INTL("!trats elttaB"))                                          # 09
+	when :RockyField	  		  then pbDisplay(_INTL("The field is littered with rocks!"))                      # 10
+	when :CorrosiveField  		  then pbDisplay(_INTL("The field is corrupted!"))                                # 11
+	when :CorrosiveMistField	  then pbDisplay(_INTL("Corrosive mist settles on the field!"))                   # 12
     end
   end
  def pbFieldEndMessage
     case @field.terrain
-    when :ElectricTerrain then pbDisplay(_INTL("The electric current disappeared from the battlefield!")) # 01
-	when :GrassyTerrain   then pbDisplay(_INTL("The grass disappeared from the battlefield!"))            # 02
-    when :MistyTerrain    then pbDisplay(_INTL("The mist disappeared from the battlefield!"))             # 03
-    when :PsychicTerrain  then pbDisplay(_INTL("The weirdness disappeared from the battlefield!"))        # 04
-    when :ElectricField   then pbDisplay(_INTL("The electric current disappeared from the battlefield!")) # 05
-    when :GrassyField     then pbDisplay(_INTL("The grass disappeared from the battlefield!"))            # 06
-    when :MistyField      then pbDisplay(_INTL("The mist disappeared from the battlefield!"))             # 07
-    when :PsychicField    then pbDisplay(_INTL("The weirdness disappeared from the battlefield!"))        # 08
-	when :InverseField    then pbDisplay(_INTL("!dne elttaB"))                                            # 09
-	when :RockyField      then pbDisplay(_INTL("The rock disappeared from the battlefield!"))             # 10
+    when :ElectricTerrain 		 then pbDisplay(_INTL("The electric current disappeared from the battlefield!")) # 01
+	when :GrassyTerrain   		 then pbDisplay(_INTL("The grass disappeared from the battlefield!"))            # 02
+    when :MistyTerrain    		 then pbDisplay(_INTL("The mist disappeared from the battlefield!"))             # 03
+    when :PsychicTerrain  		 then pbDisplay(_INTL("The weirdness disappeared from the battlefield!"))        # 04
+    when :ElectricField   		 then pbDisplay(_INTL("The electric current disappeared from the battlefield!")) # 05
+    when :GrassyField     		 then pbDisplay(_INTL("The grass disappeared from the battlefield!"))            # 06
+    when :MistyField      		 then pbDisplay(_INTL("The mist disappeared from the battlefield!"))             # 07
+    when :PsychicField    	     then pbDisplay(_INTL("The weirdness disappeared from the battlefield!"))        # 08
+	when :InverseField    	     then pbDisplay(_INTL("!dne elttaB"))                                            # 09
+	when :RockyField             then pbDisplay(_INTL("The rocks disappeared from the battlefield!"))            # 10
+	when :CorrosiveField         then pbDisplay(_INTL("The corruption disappeared from the battlefield!"))       # 11
+	when :CorrosiveMistField     then pbDisplay(_INTL("The corrosive mist disappeared from the battlefield!"))   # 12
     end
   end
 end
@@ -62,17 +66,19 @@ module BattleCreationHelperMethods
 	battle.defaultWeather = :Sandstorm   if $game_switches[103]
 	battle.defaultWeather = :Sun         if $game_switches[104]
 #===============================================================================
-    battle.defaultTerrain = :ElectricTerrain   if $game_switches[121]   # 01
-    battle.defaultTerrain = :GrassyTerrain     if $game_switches[122]   # 02
-    battle.defaultTerrain = :MistyTerrain      if $game_switches[123]   # 03
-    battle.defaultTerrain = :PsychicTerrain    if $game_switches[124]   # 04
-    #battle.defaultTerrain = :ElectricField     if [002].include?($game_map.map_id)
-    battle.defaultTerrain = :ElectricField     if $game_switches[125]   # 05
-    battle.defaultTerrain = :GrassyField       if $game_switches[126]   # 06
-    battle.defaultTerrain = :MistyField        if $game_switches[127]   # 07
-    battle.defaultTerrain = :PsychicField      if $game_switches[128]   # 08
-    battle.defaultTerrain = :InverseField      if $game_switches[129]   # 09 
-    battle.defaultTerrain = :RockyField        if $game_switches[130]   # 10
+    battle.defaultTerrain = :ElectricTerrain   		 if $game_switches[121]   # 01
+    battle.defaultTerrain = :GrassyTerrain     		 if $game_switches[122]   # 02
+    battle.defaultTerrain = :MistyTerrain      		 if $game_switches[123]   # 03
+    battle.defaultTerrain = :PsychicTerrain    		 if $game_switches[124]   # 04
+    #battle.defaultTerrain = :ElectricField     	 if [002].include?($game_map.map_id)
+    battle.defaultTerrain = :ElectricField     		 if $game_switches[125]   # 05
+    battle.defaultTerrain = :GrassyField       		 if $game_switches[126]   # 06
+    battle.defaultTerrain = :MistyField        		 if $game_switches[127]   # 07
+    battle.defaultTerrain = :PsychicField      		 if $game_switches[128]   # 08
+    battle.defaultTerrain = :InverseField      		 if $game_switches[129]   # 09 
+    battle.defaultTerrain = :RockyField        		 if $game_switches[130]   # 10
+    battle.defaultTerrain = :CorrosiveField    		 if $game_switches[131]   # 11
+	battle.defaultTerrain = :CorrosiveMistField      if $game_switches[132]   # 12
 #===============================================================================Need Announcement
     battle.field.effects[PBEffects::FairyLock] = 100         if $game_switches[111]
     battle.field.effects[PBEffects::Gravity] = 100           if $game_switches[112]
@@ -388,7 +394,7 @@ class Battle
     end
     terrain_data = GameData::BattleTerrain.try_get(@field.terrain)
     #pbCommonAnimation(terrain_data.animation) if terrain_data
-    pbFieldStartMessage
+    # pbFieldStartMessage
   end  
 end
 
@@ -404,9 +410,9 @@ class Battle::Scene
 	 terrain_data = GameData::BattleTerrain.try_get(@battle.field.terrain)
 	 fieldName = terrain_data.name
 	 root = "Graphics/Fieldbacks/"
-	 @sprites["battle_bg"].setBitmap("#{root}/#{fieldName + "battlebg"}") 
-	 @sprites["base_0"].setBitmap("#{root}/#{fieldName + "playerbase"}") 
-	 @sprites["base_1"].setBitmap("#{root}/#{fieldName + "enemybase"}")
+	 @sprites["battle_bg"].setBitmap("#{root}/#{fieldName + "_bg"}".downcase) 
+	 @sprites["base_0"].setBitmap("#{root}/#{fieldName + "_base0"}".downcase) # enemy base
+	 @sprites["base_1"].setBitmap("#{root}/#{fieldName + "_base1"}".downcase) # player base
      end 
   end
 end

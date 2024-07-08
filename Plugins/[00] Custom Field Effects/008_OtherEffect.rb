@@ -193,7 +193,7 @@ class Battle
     # Toxic Spikes
     if battler_side.effects[PBEffects::ToxicSpikes] > 0 && !battler.fainted? && !battler.airborne?
       if battler.pbHasType?(:POISON)
-        battler_side.effects[PBEffects::ToxicSpikes] = 0
+        battler_side.effects[PBEffects::ToxicSpikes] = 0 if
         pbDisplay(_INTL("{1} absorbed the poison spikes!", battler.pbThis))
       elsif battler.pbCanPoison?(nil, false) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
         if battler_side.effects[PBEffects::ToxicSpikes] == 2

@@ -176,6 +176,13 @@ class Battle::Battler
 	   b.pbLowerStatStage(:ACCURACY, 1, user)
        end
 	end
+#============================================================================= 11 Corrosive Field
+	if [:CorrosiveField].include?(@battle.field.terrain) &&
+	   [:ACIDARMOR].include?(move.id)
+	    user.pbCanRaiseStatStage?(:SPEED, user, self)
+		@battle.pbDisplay(_INTL("The corrosion enhanced the effect!"))
+		user.pbRaiseStatStage(:DEFENSE, 1, user)
+	end
 #=============================================================================
 =begin
 	@battle.pbDisplay(_INTL("The current is gone!"))
