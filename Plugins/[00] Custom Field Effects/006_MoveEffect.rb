@@ -899,6 +899,8 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
       @secretPower = 4   # Confusion, lower Speed by 1
     when :RockyField
       @secretPower = 7   # Rock Throw, flinch
+	when :CorrosiveField
+		@secretPower = 15  # Acid Spray, poison
     else
       case @battle.environment
       when :Grass, :TallGrass, :Forest, :ForestGrass
@@ -968,6 +970,8 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
       end
     when 7, 11, 13
       target.pbFlinch(user)
+	when 15
+	  target.pbPoison if taarget.pbCanPoison?(user, false, self)
     end
   end
 
@@ -988,6 +992,7 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
     when 12 then id = :GUST if GameData::Move.exists?(:GUST)
     when 13 then id = :SWIFT if GameData::Move.exists?(:SWIFT)
     when 14 then id = :PSYWAVE if GameData::Move.exists?(:PSYWAVE)
+	when 15 then id - :ACIDSPRAY if GameData::Move.exists?(:ACIDSPRAY)
     end
     super
   end
