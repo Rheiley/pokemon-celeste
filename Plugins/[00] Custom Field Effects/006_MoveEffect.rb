@@ -5,33 +5,16 @@ class Battle::Battler
   alias fieldEffects_pbEffectsAfterMove pbEffectsAfterMove
   def pbEffectsAfterMove(user, targets, move, numHits)
 #============================================================================= 01 Electric Terrain
-	if ![:ElectricTerrain, ElectricField].include?(@battle.field.terrain)
+	if ![:ElectricTerrain].include?(@battle.field.terrain)
 		if [:STOKEDSPARKSURFER].include?(move.id)
 			@battle.pbStartTerrain(user, :ElectricTerrain)
 		end
 	end
-#============================================================================= 05 Electric Field
-	if ![:ElectricField].include?(@battle.field.terrain)
-		if [:IONDELUGE].include?(move.id)
-			@battle.pbStartTerrain(user, :ElectricField)
-		end
-		if [:PLASMAFISTS].include?(move.id)
-			targets.each do |b|
-				next if b.damageState.unaffected
-				@battle.pbStartTerrain(user, :ElectricField)
-		    end
-		end
-	end
-	
-	if [:ElectricField].include?(@battle.field.terrain) 
+	if [:ElectricTerrain].include?(@battle.field.terrain) 
 		if user.affectedByTerrain? 
-			if [:MUDSPORT].include?(move.id)
+			if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
 				@battle.pbDisplay(_INTL("The current is gone!"))
 				@battle.field.terrain = :None
-			end
-			if [:CHARGE].include?(move.id) && user.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self)
-				@battle.pbDisplay(_INTL("The current enhanced the effect!"))
-				user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user)
 			end
 			if [:EERIEIMPULSE].include?(move.id) 
 				targets.each do |b|
@@ -40,27 +23,19 @@ class Battle::Battler
 					b.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
 				end
 			end
-			if [:ELECTRIC].include?(move.type)
-				targets.each do |b|
-					next if b.damageState.unaffected
-					next if b.pbHasType?(:ELECTRIC)
-					next if !b.pbCanParalyze?(user, false, self) || battle.pbRandom(100) >= 30
-					b.pbParalyze(user)
-				end
-			end
 		end
 	end
-#============================================================================= 06 Grassy Field
-	if ![:GrassyField].include?(@battle.field.terrain)
+#============================================================================= 02 Grassy Terrain
+	if ![:GrassyTerrain].include?(@battle.field.terrain)
         if [:MAGICALLEAF].include?(move.id)
 			targets.each do |b|
 				next if b.damageState.unaffected
-				@battle.pbStartTerrain(user, :GrassyField)
+				@battle.pbStartTerrain(user, :GrassyTerrain)
 			end
 		end
 	end
 	
-	if [:GrassyField].include?(@battle.field.terrain) 
+	if [:GrassyTerrain].include?(@battle.field.terrain) 
 		if user.affectedByTerrain?
 			if [:FLAMEWHEEL].include?(move.id)
 				targets.each do |b|
@@ -96,13 +71,13 @@ class Battle::Battler
 			end
 		end
 	end
-#============================================================================= 07 Misty Field
- 	if ![:MistyField].include?(@battle.field.terrain)
+#============================================================================= 03 Misty Terrain
+ 	if ![:MistyTerrain].include?(@battle.field.terrain)
 		if [:MIST].include?(move.id)
-			@battle.pbStartTerrain(user, :MistyField)
+			@battle.pbStartTerrain(user, :MistyTerrain)
 		end
 	end 
-	if [:MistyField].include?(@battle.field.terrain)
+	if [:MistyTerrain].include?(@battle.field.terrain)
 		if user.affectedByTerrain?
 			if [:SWEETSCENT].include?(move.id) 
 				targets.each do |b|
@@ -135,12 +110,12 @@ class Battle::Battler
 		end
 	end
 #============================================================================= 08 Psychic Field
-	if ![:PsychicField].include?(@battle.field.terrain)
+	if ![:PsychicTerrain].include?(@battle.field.terrain)
 		if [:PSYWAVE].include?(move.id)
-			@battle.pbStartTerrain(user, :PsychicField)
+			@battle.pbStartTerrain(user, :PsychicTerrain)
 		end
 	end
-	if [:PsychicField].include?(@battle.field.terrain)
+	if [:PsychicTerrain].include?(@battle.field.terrain)
 		if user.affectedByTerrain?
 			if [:CRUNCH].include?(move.id)
 			  @battle.pbDisplay(_INTL("The weirdness is gone!"))
@@ -201,7 +176,7 @@ class Battle::Battler
 			targets.each do |b|
 				next if b.damageState.unaffected	
 				@battle.pbDisplay(_INTL("The corrosion was purified!"))
-				@battle.pbStartTerrain(user, :GrassyField)
+				@battle.pbStartTerrain(user, :GrassyTerrain)
 			end
 		end
 	end
@@ -290,8 +265,8 @@ class Battle::Move::StartUserAirborne < Battle::Move
   end
 
   def pbEffectGeneral(user)
-	user.effects[PBEffects::MagnetRise] = 5
-	user.effects[PBEffects::MagnetRise] = 8 if [:ElectricField].include?(@battle.field.terrain)
+    user.effects[PBEffects::MagnetRise] = 5
+    user.effects[PBEffects::MagnetRise] = 8 if [:ElectricTerrain].include?(@battle.field.terrain)
     @battle.pbDisplay(_INTL("{1} levitated with electromagnetism!", user.pbThis))
   end
 end
@@ -310,7 +285,7 @@ class Battle::Move::FailsIfUserDamagedThisTurn < Battle::Move
 
   def pbMoveFailed?(user, targets)
     if (user.effects[PBEffects::FocusPunch] && user.tookMoveDamageThisRound) ||
-	   [:ElectricField].include?(@battle.field.terrain)
+	   [:ElectricTerrain].include?(@battle.field.terrain)
        @battle.pbDisplay(_INTL("{1} lost its focus and couldn't move!", user.pbThis))
        return true
     end
@@ -322,12 +297,16 @@ end
 class Battle::Move::RaiseUserSpDef1PowerUpElectricMove < Battle::Move::StatUpMove
   def initialize(battle, move)
     super
-	@statUp = [:SPECIAL_DEFENSE, 1]
+	  @statUp = [:SPECIAL_DEFENSE, 1]
   end
 
   def pbEffectGeneral(user)
     user.effects[PBEffects::Charge] = 2
     @battle.pbDisplay(_INTL("{1} began charging power!", user.pbThis))
+    if [:ElectricTerrain].include?(@battle.field.terrain)
+      user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user) 
+      @battle.pbDisplay(_INTL("The current enhanced the effect!"))
+    end
     super
   end
 end
@@ -373,7 +352,7 @@ class Battle::Move::HealTargetDependingOnGrassyTerrain < Battle::Move
   end
 
   def pbEffectAgainstTarget(user, target)
-    if [:GrassyTerrain, :GrassyField].include?(@battle.field.terrain)
+    if [:GrassyTerrain].include?(@battle.field.terrain)
 	   hpGain = (target.totalhp * 2 / 3.0).round
 	   @battle.pbDisplay(_INTL("Green grass enhanced the healing effect!"))
        target.pbRecoverHP(hpGain)	   
@@ -390,7 +369,7 @@ end
 class Battle::Move::HigherPriorityInGrassyTerrain < Battle::Move
   def pbPriority(user)
     ret = super
-	ret += 1 if [:GrassyTerrain, :GrassyField].include?(@battle.field.terrain) && user.affectedByTerrain?
+	ret += 1 if [:GrassyTerrain].include?(@battle.field.terrain) && user.affectedByTerrain?
     return ret
   end
 end
@@ -595,7 +574,7 @@ class Battle::Move::UserFaintsExplosive < Battle::Move
         return true
       end
     end
-	if [:MistyField].include?(@battle.field.terrain)
+	if [:MistyTerrain].include?(@battle.field.terrain)
 	@battle.pbDisplay(_INTL("{1} cannot use {2} in the mist!", user.pbThis, @name))
 	return true
 	end
@@ -609,7 +588,6 @@ class Battle::Move::UserFaintsExplosive < Battle::Move
   end
 end
 
-#=============================================================================== 04/08
 # Psychic Terrain
 class Battle::Move::StartPsychicTerrain < Battle::Move
   def pbMoveFailed?(user, targets)
@@ -628,7 +606,7 @@ end
 # Expanding Force
 class Battle::Move::HitsAllFoesAndPowersUpInPsychicTerrain < Battle::Move
   def pbTarget(user)
-    if [:PsychicTerrain, :PsychicField].include?(@battle.field.terrain) && user.affectedByTerrain?
+    if [:PsychicTerrain].include?(@battle.field.terrain) && user.affectedByTerrain?
       return GameData::Target.get(:AllNearFoes)
     end
     return super
@@ -773,7 +751,8 @@ end
 # Terrain Pulse
 class Battle::Move::TypeAndPowerDependOnTerrain < Battle::Move
   def pbBaseDamage(baseDmg, user, target)
-    baseDmg *= 2 if [:ElectricTerrain, :GrassyTerrain, :MistyTerrain, :PsychicTerrain].include?(@battle.field.terrain) && user.affectedByTerrain?
+    baseDmg *= 2 if [:ElectricTerrain, :GrassyTerrain, :MistyTerrain, :PsychicTerrain, 
+                    :InverseField, :RockyField, :CorrosiveField, :CorrosiveMistField].include?(@battle.field.terrain) && user.affectedByTerrain?
     return baseDmg
   end
 
@@ -782,22 +761,18 @@ class Battle::Move::TypeAndPowerDependOnTerrain < Battle::Move
     case @battle.field.terrain
     when :ElectricTerrain
       ret = :ELECTRIC      if GameData::Type.exists?(:ELECTRIC)
-    when :ElectricField
-      ret = :ELECTRIC      if GameData::Type.exists?(:ELECTRIC)
     when :GrassyTerrain
-      ret = :GRASS         if GameData::Type.exists?(:GRASS)
-    when :GrassyField
       ret = :GRASS         if GameData::Type.exists?(:GRASS)
     when :MistyTerrain
       ret = :FAIRY         if GameData::Type.exists?(:FAIRY)
-    when :MistyField
-      ret = :FAIRY         if GameData::Type.exists?(:FAIRY)
     when :PsychicTerrain
-      ret = :PSYCHIC       if GameData::Type.exists?(:PSYCHIC)
-    when :PsychicField
       ret = :PSYCHIC       if GameData::Type.exists?(:PSYCHIC)
     when :RockyField
       ret = :ROCK          if GameData::Type.exists?(:ROCK)
+    when :CorrosiveField 
+      ret = :POISON        if GameData::Type.exists?(:POISON)
+    when :CorrosiveMistField
+      ret = :POISON        if GameData::Type.exists?(:POISON)
     end
     return ret
   end
@@ -824,26 +799,18 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
     #       Attack in it?
     @npMove = :TRIATTACK
     case @battle.field.terrain
-    when :ElectricTerrain
-      @npMove = :THUNDERBOLT   if GameData::Move.exists?(:THUNDERBOLT)
-    when :ElectricField
-      @npMove = :THUNDERBOLT   if GameData::Move.exists?(:THUNDERBOLT)
-    when :GrassyTerrain
-      @npMove = :ENERGYBALL    if GameData::Move.exists?(:ENERGYBALL)
-    when :GrassyField
-      @npMove = :ENERGYBALL    if GameData::Move.exists?(:ENERGYBALL)
-    when :MistyTerrain
-      @npMove = :MOONBLAST     if GameData::Move.exists?(:MOONBLAST)
-    when :MistyField
-      @npMove = :MOONBLAST     if GameData::Move.exists?(:MOONBLAST)
-    when :PsychicTerrain
-      @npMove = :PSYCHIC       if GameData::Move.exists?(:PSYCHIC)
-    when :PsychicField
-      @npMove = :PSYCHIC       if GameData::Move.exists?(:PSYCHIC)
-    when :RockyField
-      @npMove = :ROCKSMASH     if GameData::Move.exists?(:ROCKSMASH)
-	when :CorrosiveField
-		@npMove = :ACIDSPRAY	if GameData::Move.exists?(:ACIDSPRAY)
+      when :ElectricTerrain
+        @npMove = :THUNDERBOLT   if GameData::Move.exists?(:THUNDERBOLT)
+      when :GrassyTerrain
+        @npMove = :ENERGYBALL    if GameData::Move.exists?(:ENERGYBALL)
+      when :MistyTerrain
+        @npMove = :MOONBLAST     if GameData::Move.exists?(:MOONBLAST)
+      when :PsychicTerrain
+        @npMove = :PSYCHIC       if GameData::Move.exists?(:PSYCHIC)
+      when :RockyField
+        @npMove = :ROCKSMASH     if GameData::Move.exists?(:ROCKSMASH)
+      when :CorrosiveField
+        @npMove = :ACIDSPRAY	if GameData::Move.exists?(:ACIDSPRAY)
     else
       try_move = nil
       case @battle.environment
@@ -896,24 +863,16 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
     case @battle.field.terrain
     when :ElectricTerrain
       @secretPower = 1   # Thunder Shock, paralysis
-    when :ElectricField
-      @secretPower = 1   # Thunder Shock, paralysis
     when :GrassyTerrain
-      @secretPower = 2   # Vine Whip, sleep
-    when :GrassyField
       @secretPower = 2   # Vine Whip, sleep
     when :MistyTerrain
       @secretPower = 3   # Fairy Wind, lower Sp. Atk by 1
-    when :MistyField
-      @secretPower = 3   # Fairy Wind, lower Sp. Atk by 1
     when :PsychicTerrain
-      @secretPower = 4   # Confusion, lower Speed by 1
-    when :PsychicField
       @secretPower = 4   # Confusion, lower Speed by 1
     when :RockyField
       @secretPower = 7   # Rock Throw, flinch
-	when :CorrosiveField
-		@secretPower = 15  # Acid Spray, poison
+    when :CorrosiveField
+      @secretPower = 15  # Acid Spray, poison
     else
       case @battle.environment
       when :Grass, :TallGrass, :Forest, :ForestGrass
@@ -1015,15 +974,11 @@ end
 class Battle::Move::SetUserTypesBasedOnEnvironment < Battle::Move
   TERRAIN_TYPES = {
     :ElectricTerrain => :ELECTRIC,
-    :ElectricField   => :ELECTRIC,
     :GrassyTerrain   => :GRASS,
-    :GrassyField     => :GRASS,
     :MistyTerrain    => :FAIRY,
-    :MistyField      => :FAIRY,
     :PsychicTerrain  => :PSYCHIC,
-    :PsychicField    => :PSYCHIC,
-	:RockyField      => :ROCK,
-	:CorrosiveField  => :POISON
+    :RockyField      => :ROCK,
+    :CorrosiveField  => :POISON
   }
   ENVIRONMENT_TYPES = {
     :None        => :NORMAL,
@@ -1237,6 +1192,13 @@ class Battle::Move::SwitchOutUserPassOnEffects < Battle::Move
   end
 end
 
+# Wild Charge
+class Battle::Move::RecoilQuarterOfDamageDealt < Battle::Move::RecoilMove
+  def pbRecoilDamage(user, target)
+    return (target.damageState.totalHPLost / 8.0).round if [:ElectricTerrain].include?(user.battle.field.terrain)
+    return (target.damageState.totalHPLost / 4.0).round
+  end
+end
 
 
 =begin

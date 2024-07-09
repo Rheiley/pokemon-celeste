@@ -6,56 +6,35 @@ class Battle
     return if battler.fainted?
 
 #============================================================================= 01 Electric Terrain
-	if [:ElectricTerrain].include?(@field.terrain)
-		if battler.affectedByTerrain?
+    if [:ElectricTerrain].include?(@field.terrain)
+      if battler.affectedByTerrain?
 
-		end
-	end
+      end
+    end
 #============================================================================= 02 Grassy Terrain
-	if [:GrassyTerrain].include?(@field.terrain)
-		if battler.affectedByTerrain?
-			if battler.canHeal?
-				battler.pbRecoverHP(battler.totalhp / 16)
-			    pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
-			end
-		end
-	end
-#============================================================================= 05 Electric Field
-	if [:ElectricField].include?(@field.terrain)
-		if battler.affectedByTerrain?
-			if [:Rain, :HeavyRain].include?(battler.effectiveWeather) && !battler.hasActiveAbility?([:LIGHTNINGROD, :MOTORDRIVE, :VOLTABSORB]) && !battler.pbHasType?(:ELECTRIC)
-				battler.pbTakeEffectDamage(battler.totalhp / 16) do |hp_lost|
-				pbDisplay(_INTL("{1}'s HP was reduced by the thunderstorm.", battler.pbThis))
-			end
-	    end
-	end
-#============================================================================= 06 Grassy Field
-    if [:GrassyField].include?(@field.terrain)
-		if battler.affectedByTerrain?
-			if battler.canHeal? && battler.hasActiveAbility?(:SAPSIPPER)
-				pbShowAbilitySplash(battler)
-			    battler.pbRecoverHP(battler.totalhp / 16)
-			    pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
-			    pbHideAbilitySplash(battler)
-			end
-		end
-	end
-#============================================================================= 07 Misty Field
-    if [:MistyField].include?(@field.terrain)
-		if battler.affectedByTerrain?
-			if battler.canHeal? && battler.hasActiveAbility?(:DRYSKIN)
-				pbShowAbilitySplash(battler)
-			    battler.pbRecoverHP(battler.totalhp / 16)
-			    pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))
-			    pbHideAbilitySplash(battler)
-			end
-		end
-	end
+    if [:GrassyTerrain].include?(@field.terrain)
+      if battler.affectedByTerrain?
+        if battler.canHeal?
+          battler.pbRecoverHP(battler.totalhp / 16)
+          pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
+        end
+      end
+    end
+#============================================================================= 03 Misty Terrain
+    if [:MistyTerrain].include?(@field.terrain)
+      if battler.affectedByTerrain?
+        if battler.canHeal? && battler.hasActiveAbility?(:DRYSKIN)
+          pbShowAbilitySplash(battler)
+          battler.pbRecoverHP(battler.totalhp / 16)
+          pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))
+          pbHideAbilitySplash(battler)
+        end
+      end
+	  end
 #============================================================================= 10 Rocky Field
     if [:RockyField].include?(@field.terrain) 
 		
-		
-	end
+	  end
 #=============================================================================
   end
 end
@@ -73,12 +52,12 @@ class Battle
       pbDisplay(_INTL("{1} is buffeted by the sandstorm!", battler.pbThis))
 #=============================================================================
       amt = battler.totalhp / 16
-	  amt = battler.totalhp / 8 if [:RockyField].include?(@field.terrain)
+	    amt = battler.totalhp / 8 if [:RockyField].include?(@field.terrain)
 #=============================================================================
     when :Hail
       return if !battler.takesHailDamage?
       pbDisplay(_INTL("{1} is buffeted by the hail!", battler.pbThis))
-	  amt = battler.totalhp / 16
+	    amt = battler.totalhp / 16
     when :ShadowSky
       return if !battler.takesShadowSkyDamage?
       pbDisplay(_INTL("{1} is hurt by the shadow sky!", battler.pbThis))
@@ -121,7 +100,7 @@ class Battle
       hpLoss = (Settings::MECHANICS_GENERATION >= 6) ? battler.totalhp / 6 : battler.totalhp / 8
     end
 #============================================================================= 06
-    if [:GrassyField].include?(@field.terrain) && battler.affectedByTerrain? &&
+    if [:GrassyTerrain].include?(@field.terrain) && battler.affectedByTerrain? &&
        battler.effects[PBEffects::TrappingMove] == :SNAPTRAP
        hpLoss = battler.totalhp / 6
 	end
@@ -296,7 +275,7 @@ class Battle
       next if !battler.canHeal?
 #=============================================================================
       hpGain = battler.totalhp / 16
-	  hpGain = battler.totalhp / 8 if [:MistyField].include?(@field.terrain)
+	    hpGain = battler.totalhp / 8 if [:MistyTerrain].include?(@field.terrain)
 #=============================================================================
       hpGain = (hpGain * 1.3).floor if battler.hasActiveItem?(:BIGROOT)
       battler.pbRecoverHP(hpGain)
@@ -307,19 +286,19 @@ class Battle
       next if !battler.effects[PBEffects::Ingrain]
       next if !battler.canHeal?
 #=============================================================================
-	  hpGain = battler.totalhp / 16
-      hpGain = battler.totalhp / 8 if [:GrassyField].include?(@field.terrain)
+	    hpGain = battler.totalhp / 16
+      hpGain = battler.totalhp / 8 if [:GrassyTerrain].include?(@field.terrain)
 #=============================================================================
       hpGain = (hpGain * 1.3).floor if battler.hasActiveItem?(:BIGROOT)
-	  if @field.terrain == :CorrosiveField
-		next if battler.pbHasType?(:POISON)
-		next if battler.pbHasType?(:STEEL)
-		battler.pbReduceHP(hpGain)
-		pbDisplay(_INTL("{1} absorbed the toxins with its roots!", battler.pbThis))
-	  else
-		battler.pbRecoverHP(hpGain)
-		pbDisplay(_INTL("{1} absorbed nutrients with its roots!", battler.pbThis))
-	  end
+      if @field.terrain == :CorrosiveField
+        next if battler.pbHasType?(:POISON)
+        next if battler.pbHasType?(:STEEL)
+        battler.pbReduceHP(hpGain)
+        pbDisplay(_INTL("{1} absorbed the toxins with its roots!", battler.pbThis))
+      else
+        battler.pbRecoverHP(hpGain)
+        pbDisplay(_INTL("{1} absorbed nutrients with its roots!", battler.pbThis))
+	    end
     end
     # Leech Seed
     priority.each do |battler|
@@ -363,7 +342,7 @@ class Battle
     end
 #=============================================================================
 =begin
-	if [:ElectricTerrain, :ElectricField].include?(@field.terrain) &&
+	if [:ElectricTerrain].include?(@field.terrain) &&
 	   !battler.isSpecies?(:PIKACHU)
 	partyScene&.pbDisplay(_INTL("{1} can't be switched out!", battler.pbThis))
 	return false
@@ -399,7 +378,7 @@ class Battle::Battler
 		return false if @effects[PBEffects::SmackDown]
 		return false if @battle.field.effects[PBEffects::Gravity] > 0
 #=============================================================================	
-    #return false if [:ElectricTerrain, :ElectricField].include?(@battle.field.terrain)
+    #return false if [:ElectricTerrain].include?(@battle.field.terrain)
 #=============================================================================	
 		return true if pbHasType?(:FLYING)
 		return true if hasActiveAbility?(:LEVITATE) && !@battle.moldBreaker
@@ -410,13 +389,13 @@ class Battle::Battler
 	end
 	
     def pbCanSleep?(user, showMessages, move = nil, ignoreStatus = false)
-		return false if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain, ElectricField].include?(@battle.field.terrain)
+		return false if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain].include?(@battle.field.terrain)
 		return pbCanInflictStatus?(:SLEEP, user, showMessages, move, ignoreStatus)
     end
   
 	def pbCanSleepYawn?
 		return false if self.status != :NONE
-		if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain, ElectricField].include?(@battle.field.terrain)
+		if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain].include?(@battle.field.terrain)
 		  return false
 		end
 		if !hasActiveAbility?(:SOUNDPROOF) && @battle.allBattlers.any? { |b| b.effects[PBEffects::Uproar] > 0 }

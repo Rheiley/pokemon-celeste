@@ -4,7 +4,7 @@
 # Electric Seed
 Battle::ItemEffects::TerrainStatBoost.add(:ELECTRICSEED,
   proc { |item, battler, battle|
-    next false if ![:ElectricTerrain, :ElectricField].include?(battle.field.terrain)
+    next false if ![:ElectricTerrain].include?(battle.field.terrain)
     next false if !battler.pbCanRaiseStatStage?(:DEFENSE, battler)
     itemName = GameData::Item.get(item).name
 	battle.pbCommonAnimation("UseItem", battler)
@@ -20,7 +20,7 @@ Battle::ItemEffects::TerrainStatBoost.add(:ELECTRICSEED,
 # Grassy Seed
 Battle::ItemEffects::TerrainStatBoost.add(:GRASSYSEED,
   proc { |item, battler, battle|
-    next false if ![:GrassyTerrain, :GrassyField].include?(battle.field.terrain)
+    next false if ![:GrassyTerrain].include?(battle.field.terrain)
     next false if !battler.pbCanRaiseStatStage?(:DEFENSE, battler)
     itemName = GameData::Item.get(item).name
     battle.pbCommonAnimation("UseItem", battler)
@@ -36,7 +36,7 @@ Battle::ItemEffects::TerrainStatBoost.add(:GRASSYSEED,
 # Misty Seed
 Battle::ItemEffects::TerrainStatBoost.add(:MISTYSEED,
   proc { |item, battler, battle|
-    next false if ![:MistyTerrain, :MistyField].include?(battle.field.terrain)
+    next false if ![:MistyTerrain].include?(battle.field.terrain)
     next false if !battler.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, battler)
     itemName = GameData::Item.get(item).name
     battle.pbCommonAnimation("UseItem", battler)
@@ -52,7 +52,7 @@ Battle::ItemEffects::TerrainStatBoost.add(:MISTYSEED,
 # Psychic Seed
 Battle::ItemEffects::TerrainStatBoost.add(:PSYCHICSEED,
   proc { |item, battler, battle|
-    next false if ![:PsychicTerrain, :PsychicField].include?(battle.field.terrain)
+    next false if ![:PsychicTerrain].include?(battle.field.terrain)
     next false if !battler.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, battler)
     itemName = GameData::Item.get(item).name
     battle.pbCommonAnimation("UseItem", battler)

@@ -16,7 +16,7 @@ class Battle::Battler
 =end
 #=============================================================================
 # Terrain-Based Speed Calculation
-	speedMult *= 2 if [:ElectricField].include?(@battle.field.terrain) && hasActiveAbility?(:SURGESURFER)
+	speedMult *= 2 if [:ElectricTerrain].include?(@battle.field.terrain) && hasActiveAbility?(:SURGESURFER)
 =begin
     if pbHasType?(:ELECTRIC)
 	if isSpecies?(:PIKACHU)

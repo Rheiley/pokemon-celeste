@@ -32,7 +32,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:GALVANIZE,
   proc { |ability, user, target, move, mults, power, type|
 	if move.powerBoost
 		mults[:power_multiplier] *= 1.2
-	elsif [:ElectricTerrain, :ElectricField].include?(user.battle.field.terrain)
+	elsif [:ElectricTerrain].include?(user.battle.field.terrain)
 		mults[:power_multiplier] *= 1.5
 	end
   }
@@ -41,7 +41,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:GALVANIZE,
 # Comatose
 Battle::AbilityEffects::OnSwitchIn.add(:COMATOSE,
   proc { |ability, battler, battle, switch_in|
-	next if [:ElectricField, :ElectricTerrain].include?(battle.field.terrain)
+	next if [:ElectricTerrain].include?(battle.field.terrain)
 	battle.pbShowAbilitySplash(battler)
     battle.pbDisplay(_INTL("{1} is drowsing!", battler.pbThis))
     battle.pbHideAbilitySplash(battler)
@@ -50,14 +50,14 @@ Battle::AbilityEffects::OnSwitchIn.add(:COMATOSE,
 
 Battle::AbilityEffects::StatusImmunityNonIgnorable.add(:COMATOSE,
   proc { |ability, battler, status|
-    next true if battler.isSpecies?(:KOMALA) && [:ElectricField, :ElectricTerrain].include?(battler.battle.field.terrain)
+    next true if battler.isSpecies?(:KOMALA) && [:ElectricTerrain].include?(battler.battle.field.terrain)
   }
 )
 
 Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
   proc { |ability, battler, status|
     next false if !battler.isSpecies?(:KOMALA)
-	next false if [:ElectricField, :ElectricTerrain].include?(battler.battle.field.terrain)
+	next false if [:ElectricTerrain].include?(battler.battle.field.terrain)
     next true if status.nil? || status == :SLEEP
   }
 )
@@ -106,7 +106,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:CORROSION,
 # Gulp Missile
 Battle::AbilityEffects::OnEndOfUsingMove.add(:GULPMISSILE,
   proc { |ability, user, targets, move, battle|
-	next if ![:ElectricField].include?(battle.field.terrain)
+	next if ![:ElectricTerrain].include?(battle.field.terrain)
     next if !user.isSpecies?(:CRAMORANT)
     next if user.form != 0
     if move.id == :SURF || (move.id == :DIVE && move.chargingTurn)
@@ -156,7 +156,7 @@ Battle::AbilityEffects::OnBeingHit.add(:COTTONDOWN,
     next if battle.allBattlers.none? { |b| b.index != target.index && b.pbCanLowerStatStage?(:SPEED, target) }
     battle.pbShowAbilitySplash(target)
     battle.allBattlers.each do |b|
-	 if [:GrassyField].include?(battle.field.terrain) && b.affectedByTerrain?
+	 if [:GrassyTerrain].include?(battle.field.terrain) && b.affectedByTerrain?
        b.pbLowerStatStageByAbility(:SPEED, 2, target, false) if b.index != target.index
 	 else
 	 b.pbLowerStatStageByAbility(:SPEED, 1, target, false) if b.index != target.index
@@ -189,7 +189,7 @@ Battle::AbilityEffects::DamageCalcFromTarget.add(:MARVELSCALE,
 # Soul Heart
 Battle::AbilityEffects::OnBattlerFainting.add(:SOULHEART,
   proc { |ability, battler, fainted, battle|
-    if [:MistyField].include?(battle.field.terrain)
+    if [:MistyTerrain].include?(battle.field.terrain)
 	battle.pbShowAbilitySplash(battler)
     battler.pbRaiseStatStage(:SPECIAL_ATTACK, 1, battler)
 	battler.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, battler, false)
@@ -218,13 +218,13 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:PIXILATE,
 # Pastel Veil
 Battle::AbilityEffects::DamageCalcFromTargetAlly.add(:PASTELVEIL,
   proc { |ability, user, target, move, mults, power, type|
-    mults[:final_damage_multiplier] *= 0.5 if type == :POISON && target.battle.field.terrain == :MistyField
+    mults[:final_damage_multiplier] *= 0.5 if type == :POISON && target.battle.field.terrain == :MistyTerrain
   }
 )
 
 Battle::AbilityEffects::DamageCalcFromTarget.add(:PASTELVEIL,
   proc { |ability, user, target, move, mults, power, type|
-    mults[:final_damage_multiplier] *= 0.5 if type == :POISON && target.battle.field.terrain == :MistyField
+    mults[:final_damage_multiplier] *= 0.5 if type == :POISON && target.battle.field.terrain == :MistyTerrain
   }
 )
 
@@ -342,7 +342,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:AERILATE,
 # Motor Drive
 Battle::AbilityEffects::EndOfRoundEffect.add(:MOTORDRIVE,
   proc { |ability, battler, battle|
-    if [:ElectricTerrain, :ElectricField].include?(battler.battle.field.terrain)
+    if [:ElectricTerrain].include?(battler.battle.field.terrain)
 		battle.pbShowAbilitySplash(battler)
         battle.pbDisplay(_INTL("{1} is charged by the electricity!", battler.pbThis))
 		battler.pbRaiseStatStage(:SPEED, 1, battler)
@@ -372,15 +372,11 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
       # Change to new typing
       terrain_hash = {
         :ElectricTerrain => :ELECTRIC,
-		:ElectricField   => :ELECTRIC,
         :GrassyTerrain   => :GRASS,
-		:GrassyField     => :GRASS,
         :MistyTerrain    => :FAIRY,
-		:MistyField      => :FAIRY,
         :PsychicTerrain  => :PSYCHIC,
-		:PsychicField    => :PSYCHIC,
-		:RockyField      => :ROCK,
-		:CorrosiveField	 => :POISON
+		    :RockyField      => :ROCK,
+		    :CorrosiveField	 => :POISON
       }
       new_type = terrain_hash[battle.field.terrain]
       new_type_name = nil

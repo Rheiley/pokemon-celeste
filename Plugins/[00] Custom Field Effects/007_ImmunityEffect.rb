@@ -2,18 +2,18 @@
 # Status Immunity
 #=============================================================================
 class Battle::Battler
-  alias fieldEffects_pbCanInflictStatus? pbCanInflictStatus?
-  def pbCanInflictStatus?(newStatus, user, showMessages, move = nil, ignoreStatus = false)
+   alias fieldEffects_pbCanInflictStatus? pbCanInflictStatus?
+   def pbCanInflictStatus?(newStatus, user, showMessages, move = nil, ignoreStatus = false)
 #===============================================================================
-    if [:ElectricTerrain, :ElectricField].include?(@battle.field.terrain) && affectedByTerrain? &&
-    newStatus == :SLEEP
-    @battle.pbDisplay(_INTL("{1} surrounds itself with electrified battlefield!", pbThis(true))) if showMessages
-	return false
-	end
-    if [:MistyTerrain, :MistyField].include?(@battle.field.terrain) && affectedByTerrain?
-	@battle.pbDisplay(_INTL("{1} surrounds itself with misty battlefield!", pbThis(true))) if showMessages
-	return false
-	end
+      if [:ElectricTerrain].include?(@battle.field.terrain) && affectedByTerrain? &&
+         newStatus == :SLEEP
+         @battle.pbDisplay(_INTL("{1} surrounds itself with electrified battlefield!", pbThis(true))) if showMessages
+         return false
+      end
+      if [:MistyTerrain].include?(@battle.field.terrain) && affectedByTerrain?
+         @battle.pbDisplay(_INTL("{1} surrounds itself with misty battlefield!", pbThis(true))) if showMessages
+         return false
+      end
 =begin
 	  newStatus == :FROZEN && isSpecies?(:IRONVALIANT)
 	  @battle.pbDisplay(_INTL("The example field protected {1} from being frozen!", pbThis(true))) if showMessages
@@ -21,9 +21,9 @@ class Battle::Battler
 	  end
 =end
 #===============================================================================
-  ret = fieldEffects_pbCanInflictStatus?(newStatus, user, showMessages, move, ignoreStatus)
-  ret
-  end
+      ret = fieldEffects_pbCanInflictStatus?(newStatus, user, showMessages, move, ignoreStatus)
+      ret
+   end
 end
 
 #=============================================================================
@@ -33,7 +33,7 @@ class Battle::Battler
    alias fieldEffects_pbCanSleepYawn? pbCanSleepYawn?
    def pbCanSleepYawn?
 #=============================================================================
-    if [:ElectricTerrain, :ElectricField, :MistyTerrain, :MistyField].include?(@battle.field.terrain) && affectedByTerrain?
+    if [:ElectricTerrain, :MistyTerrain].include?(@battle.field.terrain) && affectedByTerrain?
 	@battle.pbDisplay(_INTL("{1} surrounds itself with battlefield!", pbThis(true)))
 	return false
 	end
@@ -50,7 +50,7 @@ class Battle::Battler
    alias fieldEffects_pbCanConfuse? pbCanConfuse?
    def pbCanConfuse?(user = nil, showMessages = true, move = nil, selfInflicted = false)
 #===============================================================================
-     if [:MistyTerrain, :MistyField].include?(@battle.field.terrain) && affectedByTerrain?
+     if [:MistyTerrain].include?(@battle.field.terrain) && affectedByTerrain?
 	 @battle.pbDisplay(_INTL("{1} surrounds itself with misty battlefield!", pbThis(true))) if showMessages
 	 return false
 	 end
@@ -67,7 +67,7 @@ class Battle::Battler
    alias fieldEffects_pbCanSynchronizeStatus? pbCanSynchronizeStatus?
    def pbCanSynchronizeStatus?(newStatus, user)
 #===============================================================================
-     if [:MistyTerrain, :MistyField].include?(@battle.field.terrain) && affectedByTerrain?
+     if [:MistyTerrain].include?(@battle.field.terrain) && affectedByTerrain?
 	 @battle.pbDisplay(_INTL("{1} surrounds itself with misty battlefield!", pbThis(true)))
 	 return false
 	 end
@@ -87,7 +87,7 @@ class Battle::Battler
     typeMod = move.pbCalcTypeMod(move.calcType, user, target)
     target.damageState.typeMod = typeMod
 #===============================================================================
-    if [:PsychicTerrain, :PsychicField].include?(@battle.field.terrain) && target.affectedByTerrain? &&
+    if [:PsychicTerrain].include?(@battle.field.terrain) && target.affectedByTerrain? &&
 	   target.opposes?(user) && @battle.choices[user.index][4] > 0 # Move priority saved from pbCalculatePriority
 	   @battle.pbDisplay(_INTL("{1} surrounds itself with psychic battlefield!", target.pbThis(true))) if show_message
     return false
