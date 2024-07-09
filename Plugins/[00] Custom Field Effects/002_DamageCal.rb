@@ -6,7 +6,7 @@
 #[:].include?(.effectiveWeather) .affectedByTerrain? [:].include?(@id) .effects[]
 #type == : physicalMove? specialMove? contactMove? soundMove? recoilMove? multiHitMove? punchingMove? bitingMove? pulseMove? bombMove?
 class Battle::Move
-  alias fieldEffects_pbCalcDamageMultipliers pbCalcDamageMultipliers
+  # alias fieldEffects_pbCalcDamageMultipliers pbCalcDamageMultipliers
   def pbCalcDamageMultipliers(user, target, numTargets, type, baseDmg, multipliers)
 #=============================================================================
 # Global Damage Calculation
@@ -16,17 +16,10 @@ class Battle::Move
 #	multipliers[:defense_multiplier] *= 1.1
 #	multipliers[:final_damage_multiplier] *= 0.9
 #	end
-#    if target.pbOwnedByPlayer?
+#   if target.pbOwnedByPlayer?
 #	multipliers[:power_multiplier] *= 1.1
 #	multipliers[:defense_multiplier] *= 0.9
 #	multipliers[:final_damage_multiplier] *= 1.1
-#	end
-
-#	if target.isSpecies?(:LARVITAR)
-#	multipliers[:defense_multiplier] *= 2
-#	end
-#	if user.isSpecies?(:LARVITAR)
-#	multipliers[:power_multiplier] *= 2
 #	end
 #=end
 
@@ -264,74 +257,15 @@ class Battle::Move
 #============================================================================= 11
     when :CorrosiveField
 	if [:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS].include?(@id)
-		@battle.pbDisplay(_INTL("The corrosion strengthened the attack!", @name))
+		@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
 		multipliers[:power_multiplier] *= 1.5
 	end
 	if [:ACID, :ACIDSPRAY, :GRASSKNOT].include?(@id)
-		@battle.pbDisplay(_INTL("The corrosion strengthened the attack!", @name))
+		@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
 		multipliers[:power_multiplier] *= 2
 	end
 #=============================================================================
     end
-	fieldEffects_pbCalcDamageMultipliers(user, target, numTargets, type, baseDmg, multipliers)
+	# fieldEffects_pbCalcDamageMultipliers(user, target, numTargets, type, baseDmg, multipliers)
   end
 end
-
-#=begin
-#    if user.pokemon.species_data.has_flag?("Legendary")
-#	if type == :PSYCHIC && physicalMove? && user.affectedByTerrain?
-#	multipliers[:power_multiplier] *= 1.5
-#	@battle.pbDisplay(_INTL("The attack gets all beefed up!"))
-#	end
-#	if type == :BUG && specialMove? && user.affectedByTerrain?
-#	multipliers[:power_multiplier] *= 1.5
-#	@battle.pbDisplay(_INTL("The attack spreads through the exemplifying power of the field!"))
-#	end
-#	if target.isSpecies?(:PIKACHU)
-#	multipliers[:defense_multiplier] *= 1000
-#	end
-#	if target.pbHasType?(:ICE) && physicalMove?
-#    multipliers[:defense_multiplier] *= 1.2
-#	@battle.pbDisplay(_INTL(""))
-#	end
-#    if contactMove?
-#	multipliers[:power_multiplier] *= 1.2
-#	@battle.pbDisplay(_INTL("The contact move got powered up!"))
-#    end
-#	if !contactMove?
-#	multipliers[:power_multiplier] *= 1.2
-#    @battle.pbDisplay(_INTL("The non-contact move went super sayan!"))
-#    end
-#	if soundMove?
-#    multipliers[:power_multiplier] *= 1.1
-#    @battle.pbDisplay(_INTL("Echo...echo...echo..."))
-#	end
-#   if type == :GRASS && user.affectedByTerrain?
-#    multipliers[:power_multiplier] *= 0.5
-#    @battle.pbDisplay(_INTL("The move got weaker cause the user is touching grass!"))
-#    end
-#    if type == :FIRE && target.affectedByTerrain?
-#    multipliers[:power_multiplier] *= 0.5
-#  @battle.pbDisplay(_INTL("The enemy is touching grass, which makes the move weaker!")) 
-#   end
-#	if @id == :GRAVAPPLE
-#	multipliers[:power_multiplier] *= 1.5
-#	@battle.pbDisplay(_INTL("An apple fell from the tree!"))
-#	end
-#	if [:CUT, :PSYCHOCUT, :FURYCUTTER].include?(@id)
-#	multipliers[:power_multiplier] *= 1.5
-#	@battle.pbDisplay(_INTL("A tree fell onto {1}!",target.pbThis(true)))
-#	end 
-#	if [:SURF, :MUDDYWATER, :ROCKTHROW].include?(@id)
-#	multipliers[:power_multiplier] *= 0.5
-#	@battle.pbDisplay(_INTL("The attack got weaker!"))
-#	end
-#    if @id == :HURRICANE
-#   multipliers[:power_multiplier] *= 2
-#	@battle.pbDisplay(_INTL("Multiple trees fell on {1}!",target.pbThis(true)))
-#	end
-#	if @id == :ATTACKORDER
-#	multipliers[:power_multiplier] *= 1.5
-#	@battle.pbDisplay(_INTL("The wild bugs joined the attack!"))
-#	end
-#=end

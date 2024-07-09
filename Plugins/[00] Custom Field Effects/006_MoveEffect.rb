@@ -183,6 +183,15 @@ class Battle::Battler
 		@battle.pbDisplay(_INTL("The corrosion enhanced the effect!"))
 		user.pbRaiseStatStage(:DEFENSE, 1, user)
 	end
+	
+	if [:GrassyField].include?(@battle.field.terrain) && user.affectedByTerrain? &&
+       [:SEEDFLARE].include?(move.id)
+	    targets.each do |b|
+        next if b.damageState.unaffected	
+	    @battle.pbDisplay(_INTL("The corrosion was purified!"))
+	    @battle.pbStartTerrain(user, :GrassyField)
+	    end
+	end
 #=============================================================================
 =begin
 	@battle.pbDisplay(_INTL("The current is gone!"))
@@ -359,6 +368,7 @@ class Battle::Move::HealTargetDependingOnGrassyTerrain < Battle::Move
        hpGain = (target.totalhp / 2.0).round
        target.pbRecoverHP(hpGain)
 	end
+	target.pbPoison(nil, _INTL("{1} was poisoned by the corroded flowers!", target.pbThis), true) if [:CorrosiveField].include?(@battle.field.terrain) && !target.poisoned?
     @battle.pbDisplay(_INTL("{1}'s HP was restored.", target.pbThis))
   end
 end
@@ -819,6 +829,8 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
       @npMove = :PSYCHIC       if GameData::Move.exists?(:PSYCHIC)
     when :RockyField
       @npMove = :ROCKSMASH     if GameData::Move.exists?(:ROCKSMASH)
+	when :CorrosiveField
+		@npMove = :ACIDSPRAY	if GameData::Move.exists?(:ACIDSPRAY)
     else
       try_move = nil
       case @battle.environment
@@ -992,7 +1004,8 @@ class Battle::Move::SetUserTypesBasedOnEnvironment < Battle::Move
     :MistyField      => :FAIRY,
     :PsychicTerrain  => :PSYCHIC,
     :PsychicField    => :PSYCHIC,
-	:RockyField      => :ROCK
+	:RockyField      => :ROCK,
+	:CorrosiveField  => :POISON
   }
   ENVIRONMENT_TYPES = {
     :None        => :NORMAL,

@@ -55,6 +55,52 @@ class Battle::Move
 end
 
 #===============================================================================
+# Battle utilities.
+#===============================================================================
+class Battle
+  #-----------------------------------------------------------------------------
+  # Utility for checking if any battler on a particular side is at low HP.
+  #-----------------------------------------------------------------------------
+  def pbAnyBattlerLowHP?(idxBattler)
+    allSameSideBattlers(idxBattler).each { |b| return true if b.hasLowHP? }
+    return false
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Utility for checking if a trainer has any available Pokemon left in the party.
+  #-----------------------------------------------------------------------------
+  def pbTeamAllFainted?(idxSide, idxTrainer)
+    teamCount = 0
+    eachInTeam(idxSide, idxTrainer) { |pkmn, _i| teamCount += 1 if pkmn.able? }
+    return teamCount == 0
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Utility for returning an array of each battler owned by a particular trainer.
+  #-----------------------------------------------------------------------------
+  def allOwnedByTrainer(idxBattler)
+    idxTrainer = pbGetOwnerIndexFromBattlerIndex(idxBattler)
+    allies = allSameSideBattlers(idxBattler)
+    allies.select { |b| b && !b.fainted? && pbGetOwnerIndexFromBattlerIndex(b.index) == idxTrainer }
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Edits item messages for more descriptive use.
+  #-----------------------------------------------------------------------------
+  def pbUseItemMessage(item, trainerName, pkmn = nil)
+    item_data = GameData::Item.get(item)
+    itemName = item_data.portion_name
+    if pkmn.is_a?(Battle::Battler) && item_data.battle_use < 4
+      pbDisplayBrief(_INTL("{1} used the {2} on {3}.", trainerName, itemName, pkmn.pbThis(true)))
+    elsif pkmn.is_a?(Pokemon) && item_data.battle_use < 4
+      pbDisplayBrief(_INTL("{1} used the {2} on {3}.", trainerName, itemName, pkmn.name))
+    else
+      pbDisplayBrief(_INTL("{1} used the {2}.", trainerName, itemName))
+    end
+  end
+end
+
+#===============================================================================
 # Battle::Battler utilities.
 #===============================================================================
 class Battle::Battler
@@ -83,6 +129,29 @@ class Battle::Battler
   def hasLowHP?
     return false if fainted?
     return @hp <= (@totalhp / 4).floor
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Aliased to update BGM when the HP of the player's battler updates.
+  #-----------------------------------------------------------------------------
+  alias dx_pbUpdate pbUpdate
+  def pbUpdate(fullChange = false)
+    dx_pbUpdate(fullChange)
+    pbUpdateLowHPMusic if @pokemon
+  end
+  
+  def pbUpdateLowHPMusic
+    return if !Settings::PLAY_LOW_HP_MUSIC
+    return if !pbOwnedByPlayer?
+    track = pbGetBattleLowHealthBGM
+    return if !track.is_a?(RPG::AudioFile)
+    if @battle.pbAnyBattlerLowHP?(@index)
+      if @battle.playing_bgm != track.name
+        @battle.pbPauseAndPlayBGM(track)
+      end
+    elsif @battle.playing_bgm == track.name
+      @battle.pbResumeBattleBGM
+    end
   end
   
   #-----------------------------------------------------------------------------

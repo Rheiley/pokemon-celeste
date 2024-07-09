@@ -59,10 +59,43 @@ Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
 )
 
 # Toxic Boost
-Battle::AbilityEffects::OnSwitchIn.add(:TOXICBOOST,
-  proc { |ability, battler, battle, switch_in|
-	next if [:CorrosiveField].include?(battle.field.terrain)
-	battle.pbDisplay(_INTL("{1}'s Toxic Boost activated!", battler.pbThis))
+Battle::AbilityEffects::DamageCalcFromUser.add(:TOXICBOOST,
+  proc { |ability, user, target, move, mults, power, type|
+    if user.poisoned? && move.physicalMove? || user.battle.field.terrain == :CorrosiveField
+      mults[:power_multiplier] *= 1.5
+    end
+  }
+)
+
+# Poison Heal
+Battle::AbilityEffects::EndOfRoundHealing.add(:POISONHEAL,
+  proc { |ability, battler, battle|
+	if battler.poisoned?
+		pb.ShowAbilitySplash(battler)
+		battler.pbRecoverHP(battler.totalhp / 8, false)
+		battle.pbDisplay(_INTL("{1} recovered HP from its poisoning!", battler.pbThis))
+		pb.HideAbilitySplash(battler)
+	end
+	if battle.field.terrain == :CorrosiveField
+		battler.pbrecoverHP(battler.totalhp / 8, false)
+		battle.pbDisplay(__INTL("{1} recovered HP from the corrosion!", battle.pbThis))
+	end
+  }
+)
+
+# Merciless
+Battle::AbilityEffects::CriticalCalcFromUser.add(:MERCILESS,
+  proc { |ability, user, target, c|
+    next 99 if user.battle.field.terrain == :CorrosiveField || target.poisoned?
+  }
+)
+
+# Corrosion
+Battle::AbilityEffects::DamageCalcFromUser.add(:CORROSION,
+  proc { |ability, user, target, move, mults, power, type|
+    if user.battle.field.terrain == :CorrosiveField
+      mults[:power_multiplier] *= 1.5
+    end
   }
 )
 
@@ -93,6 +126,15 @@ Battle::AbilityEffects::OnSwitchIn.add(:GRASSYSURGE,
 Battle::AbilityEffects::DamageCalcFromTarget.add(:GRASSPELT,
   proc { |ability, user, target, move, mults, power, type|
     mults[:defense_multiplier] *= 1.5 if user.battle.field.terrain == :GrassyTerrain
+  }
+)
+
+Battle::AbilityEffects::EndOfRoundEffect.add(:GRASSPELT,
+  proc { |ability, battler, battle|
+    if battler.battle.field.terrain == :CorrosiveField
+		battler.pbReduceHP(battler.totalhp / 8, false)
+        battle.pbDisplay(_INTL("{1} is hurt by the corrosion!", battler.pbThis))
+    end
   }
 )
 

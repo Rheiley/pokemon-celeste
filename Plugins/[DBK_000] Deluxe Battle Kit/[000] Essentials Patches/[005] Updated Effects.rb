@@ -472,8 +472,10 @@ end
 #-------------------------------------------------------------------------------
 class Battle::Move::LowerPPOfTargetLastMoveBy4 < Battle::Move
   def pbFailsAgainstTarget?(user, target, show_message)
-    return true if target.pokemon.immunities.include?(:PPLOSS)
-    return true if !target.lastRegularMoveUsed
+    if !target.lastRegularMoveUsed || target.pokemon.immunities.include?(:PPLOSS)
+      @battle.pbDisplay(_INTL("But it failed!")) if show_message
+      return true
+    end
     if target.powerMoveIndex >= 0
       last_move = target.moves[target.powerMoveIndex]
     else

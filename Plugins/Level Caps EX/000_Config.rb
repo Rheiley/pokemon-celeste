@@ -16,7 +16,7 @@ module LevelCapsEX
   LEVEL_CAP_MODE_VARIABLE = 27
 
   # Set this to the default mode of the Level Cap
-  DEFAULT_LEVEL_CAP_MODE  = 1
+  DEFAULT_LEVEL_CAP_MODE  = 0
 
   # Set this to true if any changes to the Level Cap/Level Cap mode
   # should be printed to the console.

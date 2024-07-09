@@ -244,7 +244,7 @@ class Battle
     # Toxic Spikes
     if battler_side.effects[PBEffects::ToxicSpikes] > 0 && !battler.fainted? && !battler.airborne?
       if battler.pbHasType?(:POISON) || battler.pbHasType?(:STEEL)
-        battler_side.effects[PBEffects::ToxicSpikes] = 0
+        battler_side.effects[PBEffects::ToxicSpikes] = 0 if @field.terrain != :CorrosiveField
         pbDisplay(_INTL("{1} absorbed the poison spikes!", battler.pbThis))
       elsif battler.pbCanPoison?(nil, false) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
         if battler_side.effects[PBEffects::ToxicSpikes] == 2
@@ -263,6 +263,14 @@ class Battle
         battler.pbItemStatRestoreCheck
       end
     end
+	# Corrosive Field Entry / Residual Damage
+	if @field.terrain == :CorrosiveField && !battler.airborne? && battler.takesIndirectDamage? && GameData::Type.exists?(:POISON) && !battler.pbHasType?(:POISON) && !battler.pbHasType?(:STEEL)
+		bTypes = battler.pbTypes(true)
+		eff = Effectiveness.calculate(:POISON, *bTypes)
+		battler.pbReduceHP(battler.totalhp * eff / 8, false)
+		pbDisplay(_INTL("{1} is hurt by the corrosion!", battler.pbThis))
+	end
+	
   end
 end
 
@@ -292,8 +300,15 @@ class Battle
       hpGain = battler.totalhp / 8 if [:GrassyField].include?(@field.terrain)
 #=============================================================================
       hpGain = (hpGain * 1.3).floor if battler.hasActiveItem?(:BIGROOT)
-      battler.pbRecoverHP(hpGain)
-      pbDisplay(_INTL("{1} absorbed nutrients with its roots!", battler.pbThis))
+	  if @field.terrain == :CorrosiveField
+		next if battler.pbHasType?(:POISON)
+		next if battler.pbHasType?(:STEEL)
+		battler.pbReduceHP(hpGain)
+		pbDisplay(_INTL("{1} absorbed the toxins with its roots!", battler.pbThis))
+	  else
+		battler.pbRecoverHP(hpGain)
+		pbDisplay(_INTL("{1} absorbed nutrients with its roots!", battler.pbThis))
+	  end
     end
     # Leech Seed
     priority.each do |battler|

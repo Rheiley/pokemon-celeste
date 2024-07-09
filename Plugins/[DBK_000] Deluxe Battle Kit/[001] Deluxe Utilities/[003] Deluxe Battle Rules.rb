@@ -2,7 +2,7 @@
 # Implements new Battle Rules.
 #===============================================================================
 class Game_Temp
-  attr_accessor :old_player_data, :old_player_party
+  attr_accessor :old_player_data, :old_player_bag, :old_player_party
   
   alias dx_add_battle_rule add_battle_rule
   def add_battle_rule(rule, var = nil)
@@ -13,6 +13,7 @@ class Game_Temp
     when "tutorialcapture"   then rules["captureTutorial"]   = true
     when "autobattle"        then rules["autoBattle"]        = true
     when "towerbattle"       then rules["towerBattle"]       = false
+    when "nobag"             then rules["noBag"]             = true
     when "wildmegaevolution" then rules["wildBattleMode"]    = :mega
     when "raidstylecapture"  then rules["raidStyleCapture"]  = var
     when "setslidesprite"    then rules["slideSpriteStyle"]  = var
@@ -20,6 +21,7 @@ class Game_Temp
     when "opponentwintext"   then rules["opposingWinText"]   = var
     when "opponentlosetext"  then rules["opposingLoseText"]  = var
     when "tempplayer"        then rules["tempPlayer"]        = var
+    when "tempbag"           then rules["tempBag"]           = var
     when "tempparty"         then rules["tempParty"]         = var
     when "battlebgm"         then rules["battleBGM"]         = var
     when "victorybgm"        then rules["victoryBGM"]        = var
@@ -75,9 +77,12 @@ end
 
 def additionalRules
   return [
-    "raidstylecapture", "setslidesprite", "battleintrotext", "opponentwintext", "opponentlosetext",
-    "tempplayer", "tempparty", "battlebgm", "victorybgm", "captureme", "lowhealthbgm", "midbattlescript",
-    "editwildpokemon", "editwildpokemon2", "editwildpokemon3", "nomegaevolution"
+    "raidstylecapture", "setslidesprite", 
+    "battleintrotext", "opponentwintext", "opponentlosetext",
+    "tempplayer", "tempbag", "tempparty", 
+    "battlebgm", "victorybgm", "captureme", "lowhealthbgm", 
+    "editwildpokemon", "editwildpokemon2", "editwildpokemon3", 
+    "midbattlescript", "nomegaevolution"
   ]
 end
 
@@ -90,6 +95,7 @@ module BattleCreationHelperMethods
   
   BattleCreationHelperMethods.singleton_class.alias_method :dx_prepare_battle, :prepare_battle
   def prepare_battle(battle)
+    return BattleCreationHelperMethods.dx_prepare_battle(battle) if pbInSafari?
     battleRules = $game_temp.battle_rules
     battle.captureSuccess   = battleRules["captureSuccess"]   if !battleRules["captureSuccess"].nil?
     battle.tutorialCapture  = battleRules["captureTutorial"]  if !battleRules["captureTutorial"].nil?
@@ -97,6 +103,7 @@ module BattleCreationHelperMethods
     battle.wildBattleMode   = battleRules["wildBattleMode"]   if !battleRules["wildBattleMode"].nil?
     battle.controlPlayer    = battleRules["autoBattle"]       if !battleRules["autoBattle"].nil?
     battle.internalBattle   = battleRules["towerBattle"]      if !battleRules["towerBattle"].nil?
+    battle.noBag            = battleRules["noBag"]            if !battleRules["noBag"].nil?
     battle.introText        = battleRules["battleIntroText"]  if !battleRules["battleIntroText"].nil?
     battle.slideSpriteStyle = battleRules["slideSpriteStyle"] if !battleRules["slideSpriteStyle"].nil?
     if !battleRules["midbattleScript"].nil?
@@ -173,6 +180,8 @@ module BattleCreationHelperMethods
     $PokemonGlobal.nextBattleVictoryBGM   = battleRules["victoryBGM"]   if !battleRules["victoryBGM"].nil?
     $PokemonGlobal.nextBattleLowHealthBGM = battleRules["lowHealthBGM"] if !battleRules["lowHealthBGM"].nil?
     $PokemonGlobal.nextBattleCaptureME    = battleRules["captureME"]    if !battleRules["captureME"].nil?
+    track = (battle.wildBattle?) ? pbGetWildBattleBGM(battle.pbParty(1)) : pbGetTrainerBattleBGM(battle.opponent)
+    battle.default_bgm = (track.is_a?(String)) ? track : track&.name
   end
 end
 
@@ -340,10 +349,9 @@ end
 #===============================================================================
 class Battle
   attr_accessor :captureSuccess, :tutorialCapture, :raidStyleCapture
-  attr_accessor :wildBattleMode
-  attr_accessor :introText
-  attr_accessor :slideSpriteStyle
-  attr_accessor :playing_bgm
+  attr_accessor :wildBattleMode, :noBag
+  attr_accessor :introText, :slideSpriteStyle
+  attr_accessor :default_bgm, :playing_bgm, :bgm_paused, :bgm_position
   
   alias dx_initialize initialize
   def initialize(*args)
@@ -352,8 +360,12 @@ class Battle
     @tutorialCapture  = false
     @raidStyleCapture = false
     @wildBattleMode   = nil
+    @noBag            = false
     @introText        = nil
     @slideSpriteStyle = nil
+    @bgm_paused       = false
+    @bgm_position     = 0
+    @default_bgm      = nil
     @playing_bgm      = pbGetBattleBGM&.name
   end
   
@@ -361,13 +373,8 @@ class Battle
   # Battle music utilities.
   #-----------------------------------------------------------------------------
   def pbGetBattleBGM
-    if !@default_bgm.nil?
-      track = @default_bgm
-    else
-      track = (wildBattle?) ? pbGetWildBattleBGM(@party2) : pbGetTrainerBattleBGM(@opponent)
-    end
-    track = pbResolveAudioFile(track) if track != ""
-    return track
+    return nil if nil_or_empty?(@default_bgm)
+    return pbResolveAudioFile(@default_bgm)
   end
   
   def pbResumeBattleBGM
@@ -379,7 +386,6 @@ class Battle
     @bgm_position = 0
     @bgm_paused = false
     @playing_bgm = track.name
-    @default_bgm = nil
     Graphics.frame_reset
   end
   
@@ -392,13 +398,24 @@ class Battle
     @bgm_paused = true
     track_name = canonicalize("Audio/BGM/" + track.name)
     $game_system.bgm_play_internal2(track_name, track.volume, track.pitch, 0)
-    @default_bgm = @playing_bgm
     @playing_bgm = track.name
     Graphics.frame_reset
   end
   
   #-----------------------------------------------------------------------------
-  # Edited for battle_rules["battleIntroText"]
+  # Aliased for battle_rules["noBag"]
+  #-----------------------------------------------------------------------------
+  alias dx_pbItemMenu pbItemMenu
+  def pbItemMenu(idxBattler, firstAction)
+    if @noBag
+      pbDisplay(_INTL("Items can't be used in this battle."))
+      return false
+    end
+    return dx_pbItemMenu(idxBattler, firstAction)
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Aliased for battle_rules["battleIntroText"]
   #-----------------------------------------------------------------------------
   alias dx_pbStartBattleSendOut pbStartBattleSendOut
   def pbStartBattleSendOut(sendOuts)
@@ -642,12 +659,13 @@ EventHandlers.add(:on_wild_pokemon_created, :edit_wild_pokemon,
 )
 
 #-------------------------------------------------------------------------------
-# Used for battle_rules["tempPlayer"] and battle_rules["tempParty"].
+# Used for battle_rules["tempPlayer"], ["tempBag"], and ["tempParty"].
 #-------------------------------------------------------------------------------
 EventHandlers.add(:on_start_battle, :change_player_and_party,
   proc {
     battleRules = $game_temp.battle_rules
     old_player_data = nil
+    old_player_bag = nil
     old_player_party = nil
     if battleRules["tempPlayer"]
       old_player_data = [$player.name, $player.outfit]
@@ -662,8 +680,23 @@ EventHandlers.add(:on_start_battle, :change_player_and_party,
         end
       end
     end
+    if battleRules["tempBag"]
+      old_player_bag = $bag.clone
+      bag = battleRules["tempBag"]
+      $bag = PokemonBag.new
+      if bag.is_a?(Array)
+        bag.each_with_index do |item, i| 
+          next if !item.is_a?(Symbol)
+          qty = bag[i + 1]
+          qty = 1 if !qty.is_a?(Integer)
+          $bag.add(item, qty)
+        end
+      else
+        $bag = bag
+      end
+    end
     if battleRules["tempParty"]
-      old_player_party = $player.party
+      old_player_party = $player.party.clone
       new_party = []
       species = nil
       battleRules["tempParty"].each do |data|
@@ -682,21 +715,29 @@ EventHandlers.add(:on_start_battle, :change_player_and_party,
       $player.party = new_party if !new_party.empty?
     end
     $game_temp.old_player_data = old_player_data
+    $game_temp.old_player_bag = old_player_bag
     $game_temp.old_player_party = old_player_party
   }
 )
 
 #-------------------------------------------------------------------------------
-# Reverts battle_rules["tempPlayer"] and battle_rules["tempParty"].
+# Reverts battle_rules["tempPlayer"], ["tempBag"], and ["tempParty"].
 #-------------------------------------------------------------------------------
 EventHandlers.add(:on_end_battle, :revert_player_and_party,
   proc { |decision, canLose|
     if $game_temp.old_player_data
       $player.name = $game_temp.old_player_data[0]
       $player.outfit = $game_temp.old_player_data[1]
+      $game_temp.old_player_data = nil
+    end
+    if $game_temp.old_player_bag
+      $bag = PokemonBag.new
+      $bag = $game_temp.old_player_bag
+      $game_temp.old_player_bag = nil
     end
     if $game_temp.old_player_party
       $player.party = $game_temp.old_player_party
+      $game_temp.old_player_party = nil
     end
   }
 )

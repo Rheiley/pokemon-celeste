@@ -66,9 +66,12 @@ class Battle::Move
     end
 
 #============================================================================= Corrosive Field
-	if [:CorrosiveField].include?(@battle.field.terrain) &&
-	   [:VENOSHOCK].include?(@id)
-		power = 130
+	if [:CorrosiveField].include?(@battle.field.terrain)
+		power = 130 if [:VENOSHOCK].include?(@id)
+		
+		if ([:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS].include?(@id) || moveType == :GRASS) && GameData::Type.exists?(:POISON)
+			ret *= Effectiveness.calculate(:POISON, defType)
+		end
 	end
 #=============================================================================
 #=============================================================================
