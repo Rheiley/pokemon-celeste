@@ -1,22 +1,11 @@
-#=============================================================================
-# Damage Calculation
-#=============================================================================
-#.isSpecies?(:) .pbHasType?(:) .hasActiveAbility?(:) .hasActiveItem?(:) [:].include?(user.status) pbHasStatus?(:)
-#@battle.pbOwnSide.effects[] @battle.pbOpposingSide.effects[] @battle.field.effects[] @battle.pbCheckGlobalAbility(:)
-#[:].include?(.effectiveWeather) .affectedByTerrain? [:].include?(@id) .effects[]
-#type == : physicalMove? specialMove? contactMove? soundMove? recoilMove? multiHitMove? punchingMove? bitingMove? pulseMove? bombMove?
 class Battle::Move
-  alias fieldEffects_pbCalcDamageMultipliers pbCalcDamageMultipliers
-  def pbCalcDamageMultipliers(user, target, numTargets, type, baseDmg, multipliers)
-#=============================================================================
 
-# NONE OF THIS CODE WORKS IDK WHY
-#=============================================================================
+  def pbModifyDamage(damageMult, user, target)
 	case @battle.field.terrain
-#============================================================================= 01
+#============================================================================= 01 Electric Terrain
     when :ElectricTerrain
 		if type == :ELECTRIC && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3 
 			@battle.pbDisplay(_INTL("The current strengthened the attack!"))
 		end
 		if user.hasActiveAbility?(:HADRONENGINE) && specialMove?
@@ -35,13 +24,20 @@ class Battle::Move
 		if [:PSYBLADE].include?(@id)
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 		end
-		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
+		
+		if user.affectedByTerrain?
+			if [:TERRAINPULSE].include?(@id)
+				@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
+			end
+			if [:MAGNETBOMB].include?(@id)
+				damageMult *= 2
+				@battle.pbDisplay(__INTL("The magnetism strengthened the attack!"))
+			end
 		end
-#============================================================================= 02
+#============================================================================= 02 Grassy Terrain
 	when :GrassyTerrain
 		if type == :GRASS && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("The grass strengthened the attack!"))
 		end
 		if [:GRASSYGLIDE].include?(@id) && user.affectedByTerrain?
@@ -53,10 +49,10 @@ class Battle::Move
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
 		end
-#============================================================================= 03
+#============================================================================= 03 Misty Terrain
 	when :MistyTerrain
 		if type == :DRAGON && target.affectedByTerrain?
-			multipliers[:power_multiplier] *= 0.5
+			damageMult *= 0.5
 			@battle.pbDisplay(_INTL("The draconic power weakened..."))
 		end
 		if user.hasActiveAbility?(:PIXILATE) && powerBoost
@@ -70,10 +66,10 @@ class Battle::Move
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
 		end
-#============================================================================= 04
+#============================================================================= 04 Psychic Terrain
     when :PsychicTerrain
 		if type == :PSYCHIC && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("The weirdness boosted the attack!"))
 		end
 			if [:EXPANDINGFORCE].include?(@id) && user.affectedByTerrain?
@@ -82,75 +78,75 @@ class Battle::Move
 			if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the weirdness!", target.pbThis))
 	end
-#============================================================================= 05
+#============================================================================= 05 Electric Field
     when :ElectricField
 		if type == :ELECTRIC && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("The current strengthened the attack!"))
 		end	
 		if user.hasActiveAbility?(:HADRONENGINE) && specialMove?
-			multipliers[:power_multiplier] *= 4 / 3.0
+			damageMult *= 4 / 3.0
 			@battle.pbShowAbilitySplash(user)
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 			@battle.pbHideAbilitySplash(user)	
 		end
 		if user.hasActiveAbility?(:GALVANIZE) && powerBoost
-			multipliers[:power_multiplier] *= 1.25
+			damageMult *= 1.25
 			@battle.pbShowAbilitySplash(user)
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 			@battle.pbHideAbilitySplash(user)
 		end	
 		if user.isSpecies?(:ZAPDOS)
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))	
 		end
 		if user.isSpecies?(:MAGNEMITE)
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))	
 		end	
 		if [:EXPLOSION, :SELFDESTRUCT, :SURF, :MUDDYWATER, :HURRICANE, :SMACKDOWN, :THOUSANDARROWS].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 		end
 		if [:PSYBLADE].include?(@id)
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 		end
 		if [:TERRAINPULSE, :MAGNETBOMB, :PLASMAFISTS].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 		end 
 		if [:RISINGVOLTAGE].include?(@id) && target.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
 		end
 		if type == :ELECTRIC && target.affectedByTerrain? && [:PARALYSIS].include?(target.status)
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("{1} was hurt even more because its paralysis!", target.pbThis))
 		end	
-#============================================================================= 06
+#============================================================================= 06 Grassy Field
 	when :GrassyField
 		if type == :GRASS && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The grass strengthened the attack!"))
 		end
 		if type == :FIRE && target.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The fire burned the grass!"))
 		end
 		if [:GRASSYGLIDE].include?(@id) && user.affectedByTerrain?
 			@battle.pbDisplay(_INTL("{1} moves faster on the grass!", @name))
 		end
 		if [:BULLDOZE, :EARTHQUAKE, :MAGNITUDE, :SURF, :MUDDYWATER].include?(@id)
-			multipliers[:power_multiplier] *= 0.5
+			damageMult *= 0.5
 			@battle.pbDisplay(_INTL("The attack on {1} was weakened by the grass!", target.pbThis))
 		end
 		if [:FAIRYWIND, :SILVERWIND].include?(@id)
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The wind blew the grass up!"))
 		end
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
 		end
 		if target.hasActiveAbility?(:GRASSPELT)
@@ -159,18 +155,18 @@ class Battle::Move
 			@battle.pbDisplay(_INTL("The grass protected {1}!", target.pbThis))
 			@battle.pbHideAbilitySplash(target)
 		end
-#============================================================================= 07
+#============================================================================= 07 Misty Field
 	when :MistyField
 		if target.pbHasType?(:FAIRY) && target.affectedByTerrain? && specialMove?
 			multipliers[:defense_multiplier] *= 1.5
 			@battle.pbDisplay(_INTL("The mist protected {1}!", target.pbThis))
 		end
 		if type == :DRAGON && target.affectedByTerrain?
-			multipliers[:power_multiplier] *= 0.5
+			damageMult *= 0.5
 			@battle.pbDisplay(_INTL("The draconic power weakened..."))
 		end
 		if type == :FAIRY && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The mist strengthened the attack!"))
 		end
 		if target.hasActiveAbility?(:MARVELSCALE)
@@ -180,79 +176,75 @@ class Battle::Move
 			@battle.pbHideAbilitySplash(target)
 		end
 		if user.hasActiveAbility?(:PIXILATE) && powerBoost
-			multipliers[:power_multiplier] *= 1.25
+			damageMult *= 1.25
 			@battle.pbShowAbilitySplash(user)
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
 			@battle.pbHideAbilitySplash(user)	
 		end
 		if [:DARKPULSE, :NIGHTDAZE,:SHADOWBALL].include?(@id)
-			multipliers[:power_multiplier] *= 0.5
+			damageMult *= 0.5
 			@battle.pbDisplay(_INTL("The attack on {1} was weakened by the mist!", target.pbThis))
 		end
 		if [:MISTYEXPLOSION, :MYSTICALFIRE, :MAGICALLEAF, :DOOMDESIRE, :HIDDENPOWER, :ICYWIND, :AURASPHERE].include?(@id) ||
 		   [:MISTBALL, :STEAMERUPTION, :CLEARSMOG, :SMOG, :SILVERWIND, :STRANGESTEAM, :MOONGEISTBEAM].include?(@id)
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
 		end
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
 		end
-#============================================================================= 08
+#============================================================================= 08 Psychic Field
     when :PsychicField
 		if type == :PSYCHIC && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The weirdness boosted the attack!"))
 		end
 		if [:EXPANDINGFORCE, :MYSTICALFIRE, :MAGICALLEAF, :AURASPHERE, :HEX, :MOONBLAST, :MINDBLOWN].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the weirdness!", target.pbThis))
 		end
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the weirdness!", target.pbThis))
 		end
-#============================================================================= 09
+#============================================================================= 09 Inverse Field
     when :InverseField
 		if type == :NORMAL && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("!kcatta eht detsoob dleif ehT"))
 		end
 		if user.hasActiveAbility?(:NORMALIZE) && powerBoost
-			multipliers[:power_multiplier] *= 1.25
+			damageMult *= 1.25
 			@battle.pbShowAbilitySplash(user)
 			@battle.pbDisplay(_INTL("!dleif eht yb decnahne saw {1} no kcatta ehT", target.pbThis))
 			@battle.pbHideAbilitySplash(user)	
 		end
-#============================================================================= 10
+#============================================================================= 10 Rocky Field
     when :RockyField
-		if [:TERRAINPULSE, :EARTHQUAKE, :MAGNITUDE, :ROCKCLIMB, :STRENGTH, :BULLDOZE, :HEADBUTT].include?(@id)
-			@battle.pbDisplay(_INTL("{1} changed to Rock type!", @name))
+		if [:TERRAINPULSE].include?(@id)
+			@type = :ROCK
 			end
 		if type == :ROCK && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 1.3
+			damageMult *= 1.3
 			@battle.pbDisplay(_INTL("The rock boosted the attack on {1}!", target.pbThis))
 		end
-		if user.isSpecies?(:AERODACTYL)
-			multipliers[:power_multiplier] *= 1.2
-			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the rock!", target.pbThis))	
-		end
 		if [:TERRAINPULSE, :ROCKSMASH].include?(@id) && user.affectedByTerrain?
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the rock!", target.pbThis))
 		end
-#============================================================================= 11
+#============================================================================= 11 Corrosive Field
     when :CorrosiveField
 		if [:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS].include?(@id)
 			@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
-			multipliers[:power_multiplier] *= 1.5
+			damageMult *= 1.5
 		end
 		if [:ACID, :ACIDSPRAY, :GRASSKNOT].include?(@id)
 			@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
-			multipliers[:power_multiplier] *= 2
+			damageMult *= 2
 		end
 #=============================================================================
     end
-	fieldEffects_pbCalcDamageMultipliers(user, target, numTargets, type, baseDmg, multipliers)
+    return damageMult
   end
 end

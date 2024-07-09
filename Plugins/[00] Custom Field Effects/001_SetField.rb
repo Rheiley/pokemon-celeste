@@ -1,11 +1,11 @@
 #===============================================================================
 # Field Register
 #===============================================================================
-GameData::BattleTerrain.register({:id => :None,               :name => _INTL("None")})               # 00
-GameData::BattleTerrain.register({:id => :ElectricTerrain,    :name => _INTL("ElectricTerrain")})    # 01
-GameData::BattleTerrain.register({:id => :GrassyTerrain,      :name => _INTL("GrassyTerrain")})      # 02
-GameData::BattleTerrain.register({:id => :MistyTerrain,       :name => _INTL("MistyTerrain")})       # 03
-GameData::BattleTerrain.register({:id => :PsychicTerrain,     :name => _INTL("PsychicTerrain")})     # 04
+GameData::BattleTerrain.register({:id => :None,               :name => _INTL("None")})               # 00 None
+GameData::BattleTerrain.register({:id => :ElectricTerrain,    :name => _INTL("ElectricTerrain")})    # 01 Electric Terrain
+GameData::BattleTerrain.register({:id => :GrassyTerrain,      :name => _INTL("GrassyTerrain")})      # 02 Grassy Terrain
+GameData::BattleTerrain.register({:id => :MistyTerrain,       :name => _INTL("MistyTerrain")})       # 03 Misty Terrain
+GameData::BattleTerrain.register({:id => :PsychicTerrain,     :name => _INTL("PsychicTerrain")})     # 04 Psychic Terrain
 GameData::BattleTerrain.register({:id => :ElectricField,      :name => _INTL("ElectricField")})      # 05 Electric Field
 GameData::BattleTerrain.register({:id => :GrassyField,        :name => _INTL("GrassyField")})        # 06 Grassy Field
 GameData::BattleTerrain.register({:id => :MistyField,         :name => _INTL("MistyField")})         # 07 Misty Field

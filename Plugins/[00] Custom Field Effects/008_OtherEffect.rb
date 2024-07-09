@@ -4,46 +4,57 @@
 class Battle
   def pbEORTerrainHealing(battler)
     return if battler.fainted?
-#============================================================================= 01/05
-	if [:ElectricField].include?(@field.terrain) && battler.affectedByTerrain? &&
-	   [:Rain, :HeavyRain].include?(battler.effectiveWeather) &&
-	   !battler.hasActiveAbility?([:LIGHTNINGROD, :MOTORDRIVE, :VOLTABSORB]) &&
-	   !battler.pbHasType?(:ELECTRIC)
-	   battler.pbTakeEffectDamage(battler.totalhp / 16) do |hp_lost|
-       pbDisplay(_INTL("{1}'s HP was reduced by the thunderstorm.", battler.pbThis))
-	   end
+
+#============================================================================= 01 Electric Terrain
+	if [:ElectricTerrain].include?(@field.terrain)
+		if battler.affectedByTerrain?
+
+		end
 	end
-#============================================================================= 02/06
-	if [:GrassyTerrain, :GrassyField].include?(@field.terrain) && battler.affectedByTerrain? &&
-	   battler.canHeal?
-       battler.pbRecoverHP(battler.totalhp / 16)
-       pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
+#============================================================================= 02 Grassy Terrain
+	if [:GrassyTerrain].include?(@field.terrain)
+		if battler.affectedByTerrain?
+			if battler.canHeal?
+				battler.pbRecoverHP(battler.totalhp / 16)
+			    pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
+			end
+		end
 	end
-    if [:GrassyField].include?(@field.terrain) && battler.affectedByTerrain? &&
-	   battler.canHeal? &&
-	   battler.hasActiveAbility?(:SAPSIPPER)
-	   pbShowAbilitySplash(battler)
-       battler.pbRecoverHP(battler.totalhp / 16)
-       pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
-	   pbHideAbilitySplash(battler)
+#============================================================================= 05 Electric Field
+	if [:ElectricField].include?(@field.terrain)
+		if battler.affectedByTerrain?
+			if [:Rain, :HeavyRain].include?(battler.effectiveWeather) && !battler.hasActiveAbility?([:LIGHTNINGROD, :MOTORDRIVE, :VOLTABSORB]) && !battler.pbHasType?(:ELECTRIC)
+				battler.pbTakeEffectDamage(battler.totalhp / 16) do |hp_lost|
+				pbDisplay(_INTL("{1}'s HP was reduced by the thunderstorm.", battler.pbThis))
+			end
+	    end
 	end
-#============================================================================= 03/07
-    if [:MistyField].include?(@field.terrain) && battler.affectedByTerrain? &&
-	   battler.canHeal? &&
-	   battler.hasActiveAbility?(:DRYSKIN)
-	   pbShowAbilitySplash(battler)
-       battler.pbRecoverHP(battler.totalhp / 16)
-       pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))
-	   pbHideAbilitySplash(battler)
+#============================================================================= 06 Grassy Field
+    if [:GrassyField].include?(@field.terrain)
+		if battler.affectedByTerrain?
+			if battler.canHeal? && battler.hasActiveAbility?(:SAPSIPPER)
+				pbShowAbilitySplash(battler)
+			    battler.pbRecoverHP(battler.totalhp / 16)
+			    pbDisplay(_INTL("{1}'s HP was restored by the grass.", battler.pbThis))
+			    pbHideAbilitySplash(battler)
+			end
+		end
 	end
-#============================================================================= 10
-    if [:RockyField].include?(@field.terrain) && battler.affectedByTerrain? &&
-	   battler.canHeal? &&
-	   battler.hasActiveAbility?(:SANDSTREAM)
-	   pbShowAbilitySplash(battler)
-       battler.pbRecoverHP(battler.totalhp / 16)
-       pbDisplay(_INTL("{1}'s HP was restored by the rock.", battler.pbThis))
-	   pbHideAbilitySplash(battler)
+#============================================================================= 07 Misty Field
+    if [:MistyField].include?(@field.terrain)
+		if battler.affectedByTerrain?
+			if battler.canHeal? && battler.hasActiveAbility?(:DRYSKIN)
+				pbShowAbilitySplash(battler)
+			    battler.pbRecoverHP(battler.totalhp / 16)
+			    pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))
+			    pbHideAbilitySplash(battler)
+			end
+		end
+	end
+#============================================================================= 10 Rocky Field
+    if [:RockyField].include?(@field.terrain) 
+		
+		
 	end
 #=============================================================================
   end
@@ -382,21 +393,56 @@ end
 # Grounded
 #=============================================================================
 class Battle::Battler
-  def airborne?
-    return false if hasActiveItem?(:IRONBALL)
-    return false if @effects[PBEffects::Ingrain]
-    return false if @effects[PBEffects::SmackDown]
-    return false if @battle.field.effects[PBEffects::Gravity] > 0
+	def airborne?
+		return false if hasActiveItem?(:IRONBALL)
+		return false if @effects[PBEffects::Ingrain]
+		return false if @effects[PBEffects::SmackDown]
+		return false if @battle.field.effects[PBEffects::Gravity] > 0
 #=============================================================================	
     #return false if [:ElectricTerrain, :ElectricField].include?(@battle.field.terrain)
 #=============================================================================	
-    return true if pbHasType?(:FLYING)
-    return true if hasActiveAbility?(:LEVITATE) && !@battle.moldBreaker
-    return true if hasActiveItem?(:AIRBALLOON)
-    return true if @effects[PBEffects::MagnetRise] > 0
-    return true if @effects[PBEffects::Telekinesis] > 0
-    return false
-  end
+		return true if pbHasType?(:FLYING)
+		return true if hasActiveAbility?(:LEVITATE) && !@battle.moldBreaker
+		return true if hasActiveItem?(:AIRBALLOON)
+		return true if @effects[PBEffects::MagnetRise] > 0
+		return true if @effects[PBEffects::Telekinesis] > 0
+		return false
+	end
+	
+    def pbCanSleep?(user, showMessages, move = nil, ignoreStatus = false)
+		return false if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain, ElectricField].include?(@battle.field.terrain)
+		return pbCanInflictStatus?(:SLEEP, user, showMessages, move, ignoreStatus)
+    end
+  
+	def pbCanSleepYawn?
+		return false if self.status != :NONE
+		if affectedByTerrain? && [:ElectricTerrain, :MistyTerrain, ElectricField].include?(@battle.field.terrain)
+		  return false
+		end
+		if !hasActiveAbility?(:SOUNDPROOF) && @battle.allBattlers.any? { |b| b.effects[PBEffects::Uproar] > 0 }
+		  return false
+		end
+		if Battle::AbilityEffects.triggerStatusImmunityNonIgnorable(self.ability, self, :SLEEP)
+		  return false
+		end
+		# NOTE: Bulbapedia claims that Flower Veil shouldn't prevent sleep due to
+		#       drowsiness, but I disagree because that makes no sense. Also, the
+		#       comparable Sweet Veil does prevent sleep due to drowsiness.
+		if abilityActive? && Battle::AbilityEffects.triggerStatusImmunity(self.ability, self, :SLEEP)
+		  return false
+		end
+		allAllies.each do |b|
+		  next if !b.abilityActive?
+		  next if !Battle::AbilityEffects.triggerStatusImmunityFromAlly(b.ability, self, :SLEEP)
+		  return false
+		end
+		# NOTE: Bulbapedia claims that Safeguard shouldn't prevent sleep due to
+		#       drowsiness. I disagree with this too. Compare with the other sided
+		#       effects Misty/Electric Terrain, which do prevent it.
+		return false if pbOwnSide.effects[PBEffects::Safeguard] > 0
+		return true
+	end
+  
 end
 
 #=============================================================================

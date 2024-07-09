@@ -1,6 +1,6 @@
 #===============================================================================
 # Abilities Affected
-#=============================================================================== 01/05
+
 # Electric Surge
 Battle::AbilityEffects::OnSwitchIn.add(:ELECTRICSURGE,
   proc { |ability, battler, battle, switch_in|
@@ -30,14 +30,18 @@ Battle::AbilityEffects::ModifyMoveBaseType.add(:GALVANIZE,
 
 Battle::AbilityEffects::DamageCalcFromUser.add(:GALVANIZE,
   proc { |ability, user, target, move, mults, power, type|
-	mults[:power_multiplier] *= 1.2 if move.powerBoost
+	if move.powerBoost
+		mults[:power_multiplier] *= 1.2
+	elsif [:ElectricTerrain, :ElectricField].include?(user.battle.field.terrain)
+		mults[:power_multiplier] *= 1.5
+	end
   }
 )
 
 # Comatose
 Battle::AbilityEffects::OnSwitchIn.add(:COMATOSE,
   proc { |ability, battler, battle, switch_in|
-	next if [:ElectricField].include?(battle.field.terrain)
+	next if [:ElectricField, :ElectricTerrain].include?(battle.field.terrain)
 	battle.pbShowAbilitySplash(battler)
     battle.pbDisplay(_INTL("{1} is drowsing!", battler.pbThis))
     battle.pbHideAbilitySplash(battler)
@@ -46,14 +50,14 @@ Battle::AbilityEffects::OnSwitchIn.add(:COMATOSE,
 
 Battle::AbilityEffects::StatusImmunityNonIgnorable.add(:COMATOSE,
   proc { |ability, battler, status|
-    next true if battler.isSpecies?(:KOMALA) && battler.battle.field.terrain == :ElectricField
+    next true if battler.isSpecies?(:KOMALA) && [:ElectricField, :ElectricTerrain].include?(battler.battle.field.terrain)
   }
 )
 
 Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
   proc { |ability, battler, status|
     next false if !battler.isSpecies?(:KOMALA)
-	next false if battler.battle.field.terrain == :ElectricField
+	next false if [:ElectricField, :ElectricTerrain].include?(battler.battle.field.terrain)
     next true if status.nil? || status == :SLEEP
   }
 )
@@ -111,7 +115,7 @@ Battle::AbilityEffects::OnEndOfUsingMove.add(:GULPMISSILE,
   }
 )
 
-#=============================================================================== 02/06
+
 # Grassy Surge
 Battle::AbilityEffects::OnSwitchIn.add(:GRASSYSURGE,
   proc { |ability, battler, battle, switch_in|
@@ -162,7 +166,7 @@ Battle::AbilityEffects::OnBeingHit.add(:COTTONDOWN,
   }
 )
 
-#=============================================================================== 03/07
+
 # Misty Surge
 Battle::AbilityEffects::OnSwitchIn.add(:MISTYSURGE,
   proc { |ability, battler, battle, switch_in|
@@ -224,7 +228,6 @@ Battle::AbilityEffects::DamageCalcFromTarget.add(:PASTELVEIL,
   }
 )
 
-#=============================================================================== 04/08
 # Psychic Surge
 Battle::AbilityEffects::OnSwitchIn.add(:PSYCHICSURGE,
   proc { |ability, battler, battle, switch_in|
@@ -235,7 +238,6 @@ Battle::AbilityEffects::OnSwitchIn.add(:PSYCHICSURGE,
   }
 )
 
-#=============================================================================== 09
 # Normalize
 Battle::AbilityEffects::ModifyMoveBaseType.add(:NORMALIZE,
   proc { |ability, user, move, type|
@@ -251,7 +253,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:NORMALIZE,
   }
 )
 
-#=============================================================================== 10
+
 # Long Reach
 Battle::AbilityEffects::AccuracyCalcFromUser.add(:LONGREACH,
   proc { |ability, mods, user, target, move, type|
@@ -259,61 +261,20 @@ Battle::AbilityEffects::AccuracyCalcFromUser.add(:LONGREACH,
   }
 )
 
+# Sand Stream
 Battle::AbilityEffects::OnSwitchIn.add(:SANDSTREAM,
   proc { |ability, battler, battle, switch_in|
     battle.pbStartWeatherAbility(:Sandstorm, battler)
   }
 )
 
-Battle::AbilityEffects::OnBeingHit.add(:WEAKARMOR,
-  proc { |ability, user, target, move, battle|
-    next if !move.physicalMove?
-    next if !target.pbCanLowerStatStage?(:DEFENSE, target) &&
-            !target.pbCanRaiseStatStage?(:SPEED, target)
-    battle.pbShowAbilitySplash(target)
-    target.pbLowerStatStage(:DEFENSE, 1, target) if ![:RockyField].include?(battle.field.terrain)
-    target.pbRaiseStatStage(:SPEED,
-       (Settings::MECHANICS_GENERATION >= 7) ? 2 : 1, target)
-    battle.pbHideAbilitySplash(target)
-  }
-)
 
-Battle::AbilityEffects::AccuracyCalcFromTarget.add(:SANDVEIL,
-  proc { |ability, mods, user, target, move, type|
-    mods[:evasion_multiplier] *= 1.3 if target.effectiveWeather == :Sandstorm && [:RockyField].include?(target.battle.field.terrain)
-	mods[:evasion_multiplier] *= 1.2 if target.effectiveWeather == :Sandstorm
-  }
-)
-
-Battle::AbilityEffects::StatusImmunity.add(:ROCKHEAD,
-  proc { |ability, battler, status|
-    next true if [:RockyField].include?(battler.battle.field.terrain)
-  }
-)
-
-Battle::AbilityEffects::StatLossImmunity.add(:STURDY,
-  proc { |ability, battler, stat, battle, showMessages|
-    next if ![:RockyField].include?(battle.field.terrain)
-    if showMessages
-      battle.pbShowAbilitySplash(battler)
-      if Battle::Scene::USE_ABILITY_SPLASH
-        battle.pbDisplay(_INTL("{1}'s stats cannot be lowered!", battler.pbThis))
-      else
-        battle.pbDisplay(_INTL("{1}'s {2} prevents stat loss!", battler.pbThis, battler.abilityName))
-      end
-      battle.pbHideAbilitySplash(battler)
-    end
-    next true
-  }
-)
-
+# Battle Armor
 Battle::AbilityEffects::CriticalCalcFromTarget.add(:BATTLEARMOR,
   proc { |ability, user, target, c|
     next -1
   }
 )
-
-Battle::AbilityEffects::CriticalCalcFromTarget.copy(:BATTLEARMOR, :SHELLARMOR)
 
 Battle::AbilityEffects::OnBeingHit.add(:BATTLEARMOR,
   proc { |ability, user, target, move, battle|
@@ -335,8 +296,12 @@ Battle::AbilityEffects::OnBeingHit.add(:BATTLEARMOR,
   }
 )
 
+# Shell Armor
+Battle::AbilityEffects::CriticalCalcFromTarget.copy(:BATTLEARMOR, :SHELLARMOR)
+
 Battle::AbilityEffects::OnBeingHit.copy(:BATTLEARMOR, :SHELLARMOR)
 
+# Defeatist
 Battle::AbilityEffects::DamageCalcFromUser.add(:DEFEATIST,
   proc { |ability, user, target, move, mults, power, type|
     next if [:RockyField].include?(user.battle.field.terrain)
@@ -344,7 +309,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:DEFEATIST,
   }
 )
 
-#===============================================================================
+# Refrigerate
 Battle::AbilityEffects::ModifyMoveBaseType.add(:REFRIGERATE,
   proc { |ability, user, move, type|
     next if type != :NORMAL || !GameData::Type.exists?(:ICE)
@@ -359,6 +324,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:REFRIGERATE,
   }
 )
 
+# Aerilate
 Battle::AbilityEffects::ModifyMoveBaseType.add(:AERILATE,
   proc { |ability, user, move, type|
     next if type != :NORMAL || !GameData::Type.exists?(:FLYING)
@@ -370,6 +336,18 @@ Battle::AbilityEffects::ModifyMoveBaseType.add(:AERILATE,
 Battle::AbilityEffects::DamageCalcFromUser.add(:AERILATE,
   proc { |ability, user, target, move, mults, power, type|
     mults[:power_multiplier] *= 1.2 if move.powerBoost
+  }
+)
+
+# Motor Drive
+Battle::AbilityEffects::EndOfRoundEffect.add(:MOTORDRIVE,
+  proc { |ability, battler, battle|
+    if [:ElectricTerrain, :ElectricField].include?(battler.battle.field.terrain)
+		battle.pbShowAbilitySplash(battler)
+        battle.pbDisplay(_INTL("{1} is charged by the electricity!", battler.pbThis))
+		battler.pbRaiseStatStage(:SPEED, 1, battler)
+		battle.pbHideAbilitySplash(battler)
+    end
   }
 )
 

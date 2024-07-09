@@ -432,19 +432,22 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:ORICHALCUMPULSE,
 Battle::AbilityEffects::OnSwitchIn.add(:HADRONENGINE,
   proc { |ability, battler, battle, switch_in|
     battle.pbShowAbilitySplash(battler)
-    if battle.field.terrain == :Electric
-      battle.pbDisplay(_INTL("{1} used the Electric Terrain to energize its futuristic engine!", battler.pbThis))
-      battle.pbHideAbilitySplash(battler)
+	if battle.field.terrain == :ElectricTerrain
+		battle.pbDisplay(_INTL("{1} used the Electric Terrain to energize its futuristic engine!", battler.pbThis))
+		battle.pbHideAbilitySplash(battler)
+	elsif battle.field.terrain == :ElectricField
+		battle.pbDisplay(_INTL("{1} used the Electric Field to energize its futuristic engine!", battler.pbThis))
+		battle.pbHideAbilitySplash(battler)
     else
-      battle.pbStartTerrain(battler, :Electric)
-      battle.pbDisplay(_INTL("{1} turned the ground into Electric Terrain, energizing its futuristic engine!", battler.pbThis))
+        battle.pbStartTerrain(battler, :ElectricTerrain)
+        battle.pbDisplay(_INTL("{1} turned the ground into Electric Terrain, energizing its futuristic engine!", battler.pbThis))
     end
   }
 )
 
 Battle::AbilityEffects::DamageCalcFromUser.add(:HADRONENGINE,
   proc { |ability, user, target, move, mults, baseDmg, type|
-    mults[:attack_multiplier] *= 4 / 3.0 if move.specialMove? && user.battle.field.terrain == :Electric
+    mults[:attack_multiplier] *= 4 / 3.0 if move.specialMove? && (user.battle.field.terrain == :ElectricTerrain || user.battle.field.terrain == :ElectricField)
   }
 )
 
@@ -456,7 +459,7 @@ Battle::AbilityEffects::OnSwitchIn.add(:PROTOSYNTHESIS,
     next if battler.effects[PBEffects::Transform]
     case ability
     when :PROTOSYNTHESIS then field_check = [:Sun, :HarshSun].include?(battle.field.weather)
-    when :QUARKDRIVE     then field_check = battle.field.terrain == :Electric
+    when :QUARKDRIVE     then field_check = [:ElectricTerrain, :ElectricField].include?(battle.field.terrain)
     end
     if !field_check && !battler.effects[PBEffects::BoosterEnergy] && battler.effects[PBEffects::ParadoxStat]
       battle.pbDisplay(_INTL("The effects of {1}'s {2} wore off!", battler.pbThis(true), battler.abilityName))
