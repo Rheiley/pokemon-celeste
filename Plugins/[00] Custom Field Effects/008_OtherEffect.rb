@@ -23,7 +23,7 @@ class Battle
 #============================================================================= 03 Misty Terrain
     if [:MistyTerrain].include?(@field.terrain)
       if battler.affectedByTerrain?
-        if battler.canHeal? && battler.hasActiveAbility?(:DRYSKIN)
+        if battler.canHeal? && battler.hasActiveAbility?(:DRYSKIN) && ![:Sun, :HarshSun].include?(battler.effectiveWeather)
           pbShowAbilitySplash(battler)
           battler.pbRecoverHP(battler.totalhp / 16)
           pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))

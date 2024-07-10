@@ -295,6 +295,7 @@ class Battle
     @field.terrain         = value
     @field.terrainDuration = -1
   end
+
   def pbStartTerrain(user, newTerrain, fixedDuration = true) # 5 turns
     return if @field.terrain == newTerrain
     @field.terrain = newTerrain
@@ -306,13 +307,14 @@ class Battle
     terrain_data = GameData::BattleTerrain.try_get(@field.terrain)
     #pbCommonAnimation(terrain_data.animation) if terrain_data
     pbHideAbilitySplash(user) if user
-	pbFieldStartMessage
+	  pbFieldStartMessage
 	# Set Field Background
-	@scene.pbSetFieldBackground
+	  @scene.pbSetFieldBackground
 	# Check for abilities/items that trigger upon the terrain changing
     allBattlers.each { |b| b.pbAbilityOnTerrainChange }
     allBattlers.each { |b| b.pbItemTerrainStatBoostCheck }
   end
+  
 end
 
 #===============================================================================

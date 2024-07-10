@@ -5,181 +5,178 @@ class Battle::Battler
   alias fieldEffects_pbEffectsAfterMove pbEffectsAfterMove
   def pbEffectsAfterMove(user, targets, move, numHits)
 #============================================================================= 01 Electric Terrain
-	if ![:ElectricTerrain].include?(@battle.field.terrain)
-		if [:STOKEDSPARKSURFER].include?(move.id)
-			@battle.pbStartTerrain(user, :ElectricTerrain)
-		end
-	end
-	if [:ElectricTerrain].include?(@battle.field.terrain) 
-		if user.affectedByTerrain? 
-			if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
-				@battle.pbDisplay(_INTL("The current is gone!"))
-				@battle.field.terrain = :None
-			end
-			if [:EERIEIMPULSE].include?(move.id) 
-				targets.each do |b|
-					next if !b.pbCanLowerStatStage?(:SPECIAL_ATTACK, user, self)
-					@battle.pbDisplay(_INTL("The current enhanced the effect!"))
-					b.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
-				end
-			end
-		end
-	end
-#============================================================================= 02 Grassy Terrain
-	if ![:GrassyTerrain].include?(@battle.field.terrain)
-        if [:MAGICALLEAF].include?(move.id)
-			targets.each do |b|
-				next if b.damageState.unaffected
-				@battle.pbStartTerrain(user, :GrassyTerrain)
-			end
-		end
-	end
-	
-	if [:GrassyTerrain].include?(@battle.field.terrain) 
-		if user.affectedByTerrain?
-			if [:FLAMEWHEEL].include?(move.id)
-				targets.each do |b|
-					next if b.damageState.unaffected
-					@battle.pbDisplay(_INTL("The grass is gone!"))
-					@battle.field.terrain = :None
-				end
-			end
-			if [:SLUDGEWAVE].include?(move.id)
-				targets.each do |b|
-					next if b.damageState.unaffected	
-					@battle.pbDisplay(_INTL("The grass is gone!"))
-					@battle.pbStartTerrain(user, :CorrosiveField)
-				end
-			end
-			if [:NATURESMADNESS].include?(move.id) 
-				targets.each do |b|
-					next if b.damageState.unaffected
-					@battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-					b.pbReduceHP(b.hp / 2)
-				end
-			end
-			if [:GROWTH].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_ATTACK, user, self))
-				@battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-				user.pbRaiseStatStage(:ATTACK, 1, user)
-				user.pbRaiseStatStage(:SPECIAL_ATTACK, 1, user, false)
-			end
-			if [:COIL].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:ACCURACY, user, self))
-				@battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-				user.pbRaiseStatStage(:ATTACK, 1, user)
-				user.pbRaiseStatStage(:DEFENSE, 1, user, false)
-				user.pbRaiseStatStage(:ACCURACY, 1, user, false)
-			end
-		end
-	end
-#============================================================================= 03 Misty Terrain
- 	if ![:MistyTerrain].include?(@battle.field.terrain)
-		if [:MIST].include?(move.id)
-			@battle.pbStartTerrain(user, :MistyTerrain)
-		end
-	end 
-	if [:MistyTerrain].include?(@battle.field.terrain)
-		if user.affectedByTerrain?
-			if [:SWEETSCENT].include?(move.id) 
-				targets.each do |b|
-					next if !b.pbCanLowerStatStage?(:DEFENSE, user, self) && !b.pbCanLowerStatStage?(:SPECIAL_DEFENSE, user, self) 
-					@battle.pbDisplay(_INTL("The mist enhanced the effect!"))
-					b.pbLowerStatStage(:DEFENSE, 1, user)
-					b.pbLowerStatStage(:SPECIAL_DEFENSE, 1, user, false)
-				end
-			end
-			if [:COSMICPOWER].include?(move.id) && (user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self))
-				@battle.pbDisplay(_INTL("The mist enhanced the effect!"))
-				user.pbRaiseStatStage(:DEFENSE, 1, user)
-				user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user, false)
-			end
-			if [:AROMATICMIST].include?(move.id) 
-				targets.each do |b|
-				  next if !b.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self)
-					@battle.pbDisplay(_INTL("The mist enhanced the effect!"))
-					b.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user)
-				end
-			end
-			if [:WHIRLWIND, :GUST, :RAZORWIND, :HURRICANE, :DEFOG, :TAILWIND, :TWISTER].include?(move.id)
-			  @battle.pbDisplay(_INTL("The mist is gone!"))
-			  @battle.field.terrain = :None
-			end
-			if [:CLEARSMOG, :SMOG, :POISONGAS].include?(move.id)
-			  @battle.pbDisplay(_INTL("The mist is gone!"))
-			  @battle.pbStartTerrain(user, :CorrosiveField)
-			end
-		end
-	end
-#============================================================================= 08 Psychic Field
-	if ![:PsychicTerrain].include?(@battle.field.terrain)
-		if [:PSYWAVE].include?(move.id)
-			@battle.pbStartTerrain(user, :PsychicTerrain)
-		end
-	end
-	if [:PsychicTerrain].include?(@battle.field.terrain)
-		if user.affectedByTerrain?
-			if [:CRUNCH].include?(move.id)
-			  @battle.pbDisplay(_INTL("The weirdness is gone!"))
-			  @battle.field.terrain = :None
-			end
-		end
-	end
-#============================================================================= 09 Inverse Field
-	if ![:InverseField].include?(@battle.field.terrain)
-		if [:WONDERROOM].include?(move.id)
-			@battle.pbStartTerrain(user, :InverseField)
-		end
-	end
-	if [:InverseField].include?(@battle.field.terrain) 
-		if user.affectedByTerrain?
-			if[:MAGICROOM].include?(move.id)
-				@battle.pbDisplay(_INTL("!dne elttaB"))
-				@battle.field.terrain = :None
-			end
-		end
-	end
-#============================================================================= 10 Rocky Field
-	if [:RockyField].include?(@battle.field.terrain)
-		if [:SANDSTORM].include?(move.id)
-			@battle.pbStartTerrain(user, :RockyField)
-		end
-		if user.affectedByTerrain?
-			if [:ROCKPOLISH].include?(move.id) && user.pbCanRaiseStatStage?(:SPEED, user, self)
-				@battle.pbDisplay(_INTL("The rocks enhanced the effect!"))
-				user.pbRaiseStatStage(:SPEED, 1, user)
-			end
-			if [:ROCK].include?(move.type) && [:Sandstorm].include?(user.effectiveWeather)
-				targets.each do |b|
-          next if b.damageState.unaffected
-          next if b.pbHasType?(:ROCK)
-          next if !b.pbCanLowerStatStage?(:ACCURACY, user, self)
-          @battle.pbDisplay(_INTL("The rock blocked {1}'s sight!", b.pbThis))
-          b.pbLowerStatStage(:ACCURACY, 1, user)
+    if ![:ElectricTerrain].include?(@battle.field.terrain)
+      if [:STOKEDSPARKSURFER].include?(move.id)
+        @battle.pbStartTerrain(user, :ElectricTerrain)
+      end
+    end
+    if [:ElectricTerrain].include?(@battle.field.terrain) 
+      if user.affectedByTerrain? 
+        if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
+          @battle.pbDisplay(_INTL("The current is gone!"))
+          @battle.field.terrain = :None
         end
-			end
-			if [:SPLINTEREDSTORMSHARDS].include?(move.id)
-				targets.each do |b|
-					next if b.damageState.unaffected	
-					@battle.pbDisplay(_INTL("The field was terminated!"))
-					@battle.pbStartTerrain(user, :None)
-				end
-			end
-		end
-	end
-#============================================================================= 11 Corrosive Field
-	if [:CorrosiveField].include?(@battle.field.terrain)
-		if [:ACIDARMOR].include?(move.id) && user.affectedByTerrain?
-			user.pbCanRaiseStatStage?(:SPEED, user, self)
-			@battle.pbDisplay(_INTL("The corrosion enhanced the effect!"))
-			user.pbRaiseStatStage(:DEFENSE, 1, user)
-		end
-		if [:SEEDFLARE].include?(move.id)
-			targets.each do |b|
-				next if b.damageState.unaffected	
-				@battle.pbDisplay(_INTL("The corrosion was purified!"))
-				@battle.pbStartTerrain(user, :GrassyTerrain)
-			end
-		end
-	end
+        if [:EERIEIMPULSE].include?(move.id) 
+          targets.each do |b|
+            next if !b.pbCanLowerStatStage?(:SPECIAL_ATTACK, user, self)
+            @battle.pbDisplay(_INTL("The current enhanced the effect!"))
+            b.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
+          end
+        end
+      end
+    end
+#============================================================================= 02 Grassy Terrain
+    if ![:GrassyTerrain].include?(@battle.field.terrain)
+      if [:BLOOMDOOM].include?(move.id)
+        @battle.pbStartTerrain(user, :GrassyTerrain) # Set Grassy Terrain for 5 turns
+      end
+    end
+	
+    if [:GrassyTerrain].include?(@battle.field.terrain) 
+      if user.affectedByTerrain?
+        if [:NATURESMADNESS].include?(move.id) 
+          targets.each do |b|
+            next if b.damageState.unaffected
+            @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
+            b.pbReduceHP(b.hp / 2)
+          end
+        end
+        if [:GROWTH].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_ATTACK, user, self))
+          @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
+          user.pbRaiseStatStage(:ATTACK, 1, user)
+          user.pbRaiseStatStage(:SPECIAL_ATTACK, 1, user, false)
+        end
+        if [:COIL].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:ACCURACY, user, self)) &&
+           ![:Sun, :HarshSun].include?(user.effectiveWeather)
+          @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
+          user.pbRaiseStatStage(:ATTACK, 1, user)
+          user.pbRaiseStatStage(:DEFENSE, 1, user, false)
+          user.pbRaiseStatStage(:ACCURACY, 1, user, false)
+        end
+      end
+      if [:SLUDGEWAVE].include?(move.id)
+        @battle.pbDisplay(_INTL("The grass was corroded!"))
+        @battle.pbStartTerrain(user, :CorrosiveField, false)
+      end
+      if [:ERUPTION, :FIREPLEDGE, :FLAMEBURST, :HEATWAVE, :INCINERATE, :LAVAPLUME, :MINDBLOWN, :SEARINGSHOT, :INFERNOOVERDRIVE].include?(move.id) && 
+         ![:Rain, :HeavyRain].include?(user.effectiveWeather) && @battle.field.effects[PBEffects::WaterSportField] == 0
+        @battle.pbDisplay(_INTL("The grass was burned away!"))
+        @battle.pbStartTerrain(user, :None, false) # Will change to BurningField once it is implemented
+      end
+      if [:SPLINTEREDSTORMSHARDS].include?(move.id)
+        @battle.pbDisplay(_INTL("The terrain was destroyed!"))
+        @battle.pbStartTerrain(user, :CorrosiveField, false)
+      end
+    end
+#============================================================================= 03 Misty Terrain
+    if ![:MistyTerrain].include?(@battle.field.terrain)
+      if [:MIST].include?(move.id)
+        @battle.pbStartTerrain(user, :MistyTerrain)
+      end
+    end 
+    if [:MistyTerrain].include?(@battle.field.terrain)
+      if user.affectedByTerrain?
+        if [:SWEETSCENT].include?(move.id) 
+          targets.each do |b|
+            next if !b.pbCanLowerStatStage?(:DEFENSE, user, self) && !b.pbCanLowerStatStage?(:SPECIAL_DEFENSE, user, self) 
+            @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
+            b.pbLowerStatStage(:DEFENSE, 1, user)
+            b.pbLowerStatStage(:SPECIAL_DEFENSE, 1, user, false)
+          end
+        end
+        if [:COSMICPOWER].include?(move.id) && (user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self))
+          @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
+          user.pbRaiseStatStage(:DEFENSE, 1, user)
+          user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user, false)
+        end
+        if [:AROMATICMIST].include?(move.id) 
+          targets.each do |b|
+            next if !b.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self)
+            @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
+            b.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user)
+          end
+        end
+        if [:WHIRLWIND, :GUST, :RAZORWIND, :HURRICANE, :DEFOG, :TAILWIND, :TWISTER].include?(move.id)
+          @battle.pbDisplay(_INTL("The mist is gone!"))
+          @battle.field.terrain = :None
+        end
+        if [:CLEARSMOG, :SMOG, :POISONGAS].include?(move.id)
+          @battle.pbDisplay(_INTL("The mist is gone!"))
+          @battle.pbStartTerrain(user, :CorrosiveField)
+        end
+      end
+    end
+#============================================================================= 04 Psychic Terrain
+    if ![:PsychicTerrain].include?(@battle.field.terrain)
+      if [:PSYWAVE].include?(move.id)
+        @battle.pbStartTerrain(user, :PsychicTerrain)
+      end
+    end
+    if [:PsychicTerrain].include?(@battle.field.terrain)
+      if user.affectedByTerrain?
+        if [:CRUNCH].include?(move.id)
+          @battle.pbDisplay(_INTL("The weirdness is gone!"))
+          @battle.field.terrain = :None
+        end
+      end
+    end
+#============================================================================= 05 Inverse Field
+    if ![:InverseField].include?(@battle.field.terrain)
+      if [:WONDERROOM].include?(move.id)
+        @battle.pbStartTerrain(user, :InverseField)
+      end
+    end
+    if [:InverseField].include?(@battle.field.terrain) 
+      if user.affectedByTerrain?
+        if[:MAGICROOM].include?(move.id)
+          @battle.pbDisplay(_INTL("!dne elttaB"))
+          @battle.field.terrain = :None
+        end
+      end
+    end
+#============================================================================= 06 Rocky Field
+    if [:RockyField].include?(@battle.field.terrain)
+      if [:SANDSTORM].include?(move.id)
+        @battle.pbStartTerrain(user, :RockyField)
+      end
+      if user.affectedByTerrain?
+        if [:ROCKPOLISH].include?(move.id) && user.pbCanRaiseStatStage?(:SPEED, user, self)
+          @battle.pbDisplay(_INTL("The rocks enhanced the effect!"))
+          user.pbRaiseStatStage(:SPEED, 1, user)
+        end
+        if [:ROCK].include?(move.type) && [:Sandstorm].include?(user.effectiveWeather)
+          targets.each do |b|
+            next if b.damageState.unaffected
+            next if b.pbHasType?(:ROCK)
+            next if !b.pbCanLowerStatStage?(:ACCURACY, user, self)
+            @battle.pbDisplay(_INTL("The rock blocked {1}'s sight!", b.pbThis))
+            b.pbLowerStatStage(:ACCURACY, 1, user)
+          end
+        end
+        if [:SPLINTEREDSTORMSHARDS].include?(move.id)
+          #targets.each do |b|
+          #next if b.damageState.unaffected	
+          @battle.pbDisplay(_INTL("The field was terminated!"))
+          @battle.pbStartTerrain(user, :None)
+          #end
+        end
+      end
+    end
+#============================================================================= 07 Corrosive Field
+    if [:CorrosiveField].include?(@battle.field.terrain)
+      if [:ACIDARMOR].include?(move.id) && user.affectedByTerrain?
+        user.pbCanRaiseStatStage?(:SPEED, user, self)
+        @battle.pbDisplay(_INTL("The corrosion enhanced the effect!"))
+        user.pbRaiseStatStage(:DEFENSE, 1, user)
+      end
+      if [:SEEDFLARE].include?(move.id)
+        #targets.each do |b|
+          #next if b.damageState.unaffected	
+        @battle.pbDisplay(_INTL("The corrosion was purified!"))
+        @battle.pbStartTerrain(user, :GrassyTerrain)
+        #end
+      end
+    end
 #=============================================================================
 =begin
 	@battle.pbDisplay(_INTL("The current is gone!"))
@@ -206,7 +203,7 @@ end
 
 #===============================================================================
 # Move Affected
-#=============================================================================== 01/05
+#=============================================================================== 
 # Electric Terrain
 class Battle::Move::StartElectricTerrain < Battle::Move
   def pbMoveFailed?(user, targets)
@@ -369,7 +366,7 @@ end
 class Battle::Move::HigherPriorityInGrassyTerrain < Battle::Move
   def pbPriority(user)
     ret = super
-	ret += 1 if [:GrassyTerrain].include?(@battle.field.terrain) && user.affectedByTerrain?
+	  ret += 1 if [:GrassyTerrain].include?(@battle.field.terrain) && user.affectedByTerrain?
     return ret
   end
 end
@@ -432,6 +429,7 @@ end
 # Nature's Madness / Super Fang
 class Battle::Move::FixedDamageHalfTargetHP < Battle::Move::FixedDamageMove
   def pbFixedDamage(user, target)
+    return (target.hp * 0.75).round if [:NATURESMADNESS].include?(@id) && [:GrassyTerrain].include?(user.battle.field.terrain)
     return (target.hp / 2.0).round
   end
 end

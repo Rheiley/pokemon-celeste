@@ -36,17 +36,29 @@ class Battle::Move
 			end
 #============================================================================= 02 Grassy Terrain
 	when :GrassyTerrain
-		if type == :GRASS && user.affectedByTerrain?
-			damageMult *= 1.3
-			@battle.pbDisplay(_INTL("The grass strengthened the attack!"))
+		if type == :GRASS
+			if user.affectedByTerrain?
+				if [:GRASSYGLIDE].include?(@id)
+					@battle.pbDisplay(_INTL("{1} moves faster on the grass!", @name))
+				end
+				damageMult *= 1.3
+				@battle.pbDisplay(_INTL("The grass strengthened the attack!"))
+			end
 		end
-		if [:GRASSYGLIDE].include?(@id) && user.affectedByTerrain?
-			@battle.pbDisplay(_INTL("{1} moves faster on the grass!", @name))
+		if type == :FIRE
+			if target.affectedByTerrain?
+				damageMult *= 1.3
+				@battle.pbDisplay(_INTL("The grass below caught flame!"))
+			end
 		end
-		if [:BULLDOZE, :EARTHQUAKE, :MAGNITUDE].include?(@id)
+		if [:BULLDOZE, :EARTHQUAKE, :MAGNITUDE, :MUDDYWATER, :SURF].include?(@id)
 			@battle.pbDisplay(_INTL("The attack on {1} was weakened by the grass!", target.pbThis))
 		end
 		if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
+			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
+		end
+		if [:FAIRYWIND, SILVERWIND].include?(@id)
+			damageMult *= 1.5
 			@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
 		end
 #============================================================================= 03 Misty Terrain
