@@ -30,10 +30,10 @@ Battle::AbilityEffects::ModifyMoveBaseType.add(:GALVANIZE,
 
 Battle::AbilityEffects::DamageCalcFromUser.add(:GALVANIZE,
   proc { |ability, user, target, move, mults, power, type|
-	if move.powerBoost
-		mults[:power_multiplier] *= 1.2
-	elsif [:ElectricTerrain].include?(user.battle.field.terrain)
+	if [:ElectricTerrain].include?(user.battle.field.terrain) && move.powerBoost
 		mults[:power_multiplier] *= 1.5
+	elsif move.powerBoost
+		mults[:power_multiplier] *= 1.2
 	end
   }
 )
@@ -180,7 +180,7 @@ Battle::AbilityEffects::OnSwitchIn.add(:MISTYSURGE,
 # Marvel Scale
 Battle::AbilityEffects::DamageCalcFromTarget.add(:MARVELSCALE,
   proc { |ability, user, target, move, mults, power, type|
-    if target.pbHasAnyStatus? && move.physicalMove?
+    if target.pbHasAnyStatus? && move.physicalMove? || [:MistyTerrain].include?(user.battle.field.terrain)
       mults[:defense_multiplier] *= 1.5
     end
   }
@@ -211,7 +211,11 @@ Battle::AbilityEffects::ModifyMoveBaseType.add(:PIXILATE,
 
 Battle::AbilityEffects::DamageCalcFromUser.add(:PIXILATE,
   proc { |ability, user, target, move, mults, power, type|
-	mults[:power_multiplier] *= 1.2 if move.powerBoost
+    if [:MistyTerrain].include?(user.battle.field.terrain) && move.powerBoost
+      mults[:power_multiplier] *= 1.5
+    elsif move.powerBoost
+      mults[:power_multiplier] *= 1.2
+    end
   }
 )
 

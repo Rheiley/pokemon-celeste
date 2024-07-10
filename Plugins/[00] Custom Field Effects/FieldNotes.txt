@@ -125,18 +125,30 @@ Transitions from Other Fields:
 
 General Effects:
 - Dragon-type moves decrease in base power by 0.5x
-- Fairy-type Pokemon's Sp. Def is boosted by 1.5x
 - Grounded Pokemon are immune to status conditions, yawn and confusion
 
-ABILITY:
-Mimicry changes the user's type to Fairy
+Abilities Affected:
+- Pixilate's base power boost is increased to 1.5x (from 1.2x)
+- Marvel Scale is activated
+- Dry Skin additionally restores 1/16 of the bearer's maximum HP each turn in the absence of harsh sunlight and rain
+- Soul-Heart additionally raises Special Defense by one stage on activation
+- Mimicry changes the user's type to Fairy
 
-MOVE:
-Dragon moves against grounded Pokemon decrease in base power x0.5
+Moves that increase in base power by 1.5x:
+- Aura Sphere
+- Dazzling Gleam
+- Doom Desire
+- Fairy Wind
+- Icy Wind
+- Magical Leaf
+- Mist Ball
+- Moonblast
+- Moongeist Beam
+- Mystical Fire
+- Silver Wind
+- Steam Eruption
+- Misty Explosion
 
-These moves power are changed: 
-x1.5   Misty Explosion
-x2     Terrain Pulse
 
 These moves effect changed:
 Terrain Pulse becomes Fairy move
