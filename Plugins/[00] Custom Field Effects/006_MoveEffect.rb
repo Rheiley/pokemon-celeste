@@ -474,7 +474,6 @@ class Battle::Move::StartHealUserEachTurnTrapUserInBattle < Battle::Move
   end
 end
 
-#=============================================================================== 03/07
 # Misty Terrain
 class Battle::Move::StartMistyTerrain < Battle::Move
   def pbMoveFailed?(user, targets)

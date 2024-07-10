@@ -65,7 +65,7 @@ class Battle::Move
 			when :MistyTerrain
 				if type == :DRAGON && target.affectedByTerrain?
 					baseDmg *= 0.5
-					@battle.pbDisplay(_INTL("The draconic power weakened..."))
+					@battle.pbDisplay(_INTL("The draconic power was weakened..."))
 				end
 				if user.hasActiveAbility?(:PIXILATE) && powerBoost
 					@battle.pbShowAbilitySplash(user)
@@ -81,6 +81,10 @@ class Battle::Move
 				if [:AURASPHERE, :DAZZLINGGLEAM, :DOOMDESIRE, :FAIRYWIND, :ICYWIND, :MAGICALLEAF, :MISTBALL, :MOONBLAST, :MOONGEISTBEAM, :MYSTICALFIRE, :SILVERWIND, :STEAMERUPTION].include?(@id)
 					baseDmg *= 1.5
 					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
+				end
+				if [:DARKPULSE, :NIGHTDAZE, :SHADOWBALL].include?(@id)
+					baseDmg *= 0.5
+					@battle.pbDisplay(_INTL("The attack on {1} was cleansed!", target.pbThis))
 				end
 #============================================================================= 04 Psychic Terrain
 			when :PsychicTerrain
