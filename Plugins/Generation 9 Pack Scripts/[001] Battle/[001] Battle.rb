@@ -317,7 +317,7 @@ class Battle::Move
       mult = (i.even?) ? multipliers[:attack_multiplier] : multipliers[:defense_multiplier]
       mult *= 0.75 if @battle.pbCheckGlobalAbility(abil) && !user.hasActiveAbility?(abil) && category
     end
-    if [:ElectricTerrain, :ElectricField].include?(@battle.field.terrain) && user.affectedByTerrain? &&
+    if [:ElectricTerrain].include?(@battle.field.terrain) && user.affectedByTerrain? &&
        @function_code == "IncreasePowerWhileElectricTerrain"
       multipliers[:power_multiplier] *= 1.5 if type != :ELECTRIC
     end

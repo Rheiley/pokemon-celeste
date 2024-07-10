@@ -6,23 +6,14 @@ class Battle::Battler
   def pbEffectsAfterMove(user, targets, move, numHits)
 #============================================================================= 01 Electric Terrain
     if ![:ElectricTerrain].include?(@battle.field.terrain)
-      if [:STOKEDSPARKSURFER].include?(move.id)
+      if [:STOKEDSPARKSURFER, :IONDELUGE, :PLASMAFISTS].include?(move.id)
         @battle.pbStartTerrain(user, :ElectricTerrain)
       end
     end
     if [:ElectricTerrain].include?(@battle.field.terrain) 
-      if user.affectedByTerrain? 
-        if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
-          @battle.pbDisplay(_INTL("The current is gone!"))
-          @battle.field.terrain = :None
-        end
-        if [:EERIEIMPULSE].include?(move.id) 
-          targets.each do |b|
-            next if !b.pbCanLowerStatStage?(:SPECIAL_ATTACK, user, self)
-            @battle.pbDisplay(_INTL("The current enhanced the effect!"))
-            b.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
-          end
-        end
+      if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
+        @battle.pbDisplay(_INTL("The hyper-charged terrain shorted out!"))
+        @battle.pbStartTerrain(user, :None, false)
       end
     end
 #============================================================================= 02 Grassy Terrain
@@ -31,41 +22,15 @@ class Battle::Battler
         @battle.pbStartTerrain(user, :GrassyTerrain) # Set Grassy Terrain for 5 turns
       end
     end
-	
     if [:GrassyTerrain].include?(@battle.field.terrain) 
-      if user.affectedByTerrain?
-        if [:NATURESMADNESS].include?(move.id) 
-          targets.each do |b|
-            next if b.damageState.unaffected
-            @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-            b.pbReduceHP(b.hp / 2)
-          end
-        end
-        if [:GROWTH].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_ATTACK, user, self))
-          @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-          user.pbRaiseStatStage(:ATTACK, 1, user)
-          user.pbRaiseStatStage(:SPECIAL_ATTACK, 1, user, false)
-        end
-        if [:COIL].include?(move.id) && (user.pbCanRaiseStatStage?(:ATTACK, user, self) || user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:ACCURACY, user, self)) &&
-           ![:Sun, :HarshSun].include?(user.effectiveWeather)
-          @battle.pbDisplay(_INTL("The grass enhanced the effect!"))
-          user.pbRaiseStatStage(:ATTACK, 1, user)
-          user.pbRaiseStatStage(:DEFENSE, 1, user, false)
-          user.pbRaiseStatStage(:ACCURACY, 1, user, false)
-        end
-      end
-      if [:SLUDGEWAVE].include?(move.id)
-        @battle.pbDisplay(_INTL("The grass was corroded!"))
+      if [:SLUDGEWAVE, :ACIDDOWNPOUR].include?(move.id)
+        @battle.pbDisplay(_INTL("The grassy terrain was corroded!"))
         @battle.pbStartTerrain(user, :CorrosiveField, false)
       end
       if [:ERUPTION, :FIREPLEDGE, :FLAMEBURST, :HEATWAVE, :INCINERATE, :LAVAPLUME, :MINDBLOWN, :SEARINGSHOT, :INFERNOOVERDRIVE].include?(move.id) && 
          ![:Rain, :HeavyRain].include?(user.effectiveWeather) && @battle.field.effects[PBEffects::WaterSportField] == 0
         @battle.pbDisplay(_INTL("The grass was burned away!"))
         @battle.pbStartTerrain(user, :None, false) # Will change to BurningField once it is implemented
-      end
-      if [:SPLINTEREDSTORMSHARDS].include?(move.id)
-        @battle.pbDisplay(_INTL("The terrain was destroyed!"))
-        @battle.pbStartTerrain(user, :CorrosiveField, false)
       end
     end
 #============================================================================= 03 Misty Terrain
@@ -79,30 +44,24 @@ class Battle::Battler
         if [:SWEETSCENT].include?(move.id) 
           targets.each do |b|
             next if !b.pbCanLowerStatStage?(:DEFENSE, user, self) && !b.pbCanLowerStatStage?(:SPECIAL_DEFENSE, user, self) 
-            @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
             b.pbLowerStatStage(:DEFENSE, 1, user)
             b.pbLowerStatStage(:SPECIAL_DEFENSE, 1, user, false)
           end
         end
-        if [:COSMICPOWER].include?(move.id) && (user.pbCanRaiseStatStage?(:DEFENSE, user, self) || user.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self))
-          @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
-          user.pbRaiseStatStage(:DEFENSE, 1, user)
-          user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user, false)
-        end
         if [:AROMATICMIST].include?(move.id) 
           targets.each do |b|
             next if !b.pbCanRaiseStatStage?(:SPECIAL_DEFENSE, user, self)
-            @battle.pbDisplay(_INTL("The mist enhanced the effect!"))
             b.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user)
           end
         end
-        if [:WHIRLWIND, :GUST, :RAZORWIND, :HURRICANE, :DEFOG, :TAILWIND, :TWISTER].include?(move.id)
-          @battle.pbDisplay(_INTL("The mist is gone!"))
-          @battle.field.terrain = :None
+        if [:WHIRLWIND, :GUST, :RAZORWIND, :HURRICANE, :DEFOG, :TAILWIND, :TWISTER, :SUPERSONICSKYSTRIKE].include?(move.id)
+          @battle.pbDisplay(_INTL("The mist was blown away!"))
+          #@battle.field.terrain = :None
+          @battle.pbStartTerrain(user, :None, false)
         end
-        if [:CLEARSMOG, :SMOG, :POISONGAS].include?(move.id)
-          @battle.pbDisplay(_INTL("The mist is gone!"))
-          @battle.pbStartTerrain(user, :CorrosiveField)
+        if [:CLEARSMOG, :SMOG, :POISONGAS, :ACIDDOWNPOUR].include?(move.id)
+          @battle.pbDisplay(_INTL("The mist was corroded!"))
+          @battle.pbStartTerrain(user, :CorrosiveField, false) # CHANGE THIS TO CorrosiveMistField once implemented
         end
       end
     end
@@ -141,7 +100,6 @@ class Battle::Battler
       end
       if user.affectedByTerrain?
         if [:ROCKPOLISH].include?(move.id) && user.pbCanRaiseStatStage?(:SPEED, user, self)
-          @battle.pbDisplay(_INTL("The rocks enhanced the effect!"))
           user.pbRaiseStatStage(:SPEED, 1, user)
         end
         if [:ROCK].include?(move.type) && [:Sandstorm].include?(user.effectiveWeather)
@@ -149,7 +107,6 @@ class Battle::Battler
             next if b.damageState.unaffected
             next if b.pbHasType?(:ROCK)
             next if !b.pbCanLowerStatStage?(:ACCURACY, user, self)
-            @battle.pbDisplay(_INTL("The rock blocked {1}'s sight!", b.pbThis))
             b.pbLowerStatStage(:ACCURACY, 1, user)
           end
         end
@@ -429,7 +386,7 @@ end
 # Nature's Madness / Super Fang
 class Battle::Move::FixedDamageHalfTargetHP < Battle::Move::FixedDamageMove
   def pbFixedDamage(user, target)
-    return (target.hp * 0.75).round if [:NATURESMADNESS].include?(@id) && [:GrassyTerrain].include?(user.battle.field.terrain)
+    return (target.hp * 3.0 / 4.0).round if [:NATURESMADNESS].include?(@id) && [:GrassyTerrain].include?(user.battle.field.terrain)
     return (target.hp / 2.0).round
   end
 end
@@ -452,7 +409,11 @@ end
 class Battle::Move::RaiseUserAtkDefAcc1 < Battle::Move::MultiStatUpMove
   def initialize(battle, move)
     super
-    @statUp = [:ATTACK, 1, :DEFENSE, 1, :ACCURACY, 1]
+    if ![:Sun, :HarshSun].include?(user.effectiveWeather)
+      @statUp = [:ATTACK, 2, :DEFENSE, 2, :ACCURACY, 2]
+    else
+      @statUp = [:ATTACK, 1, :DEFENSE, 1, :ACCURACY, 1]
+    end
   end
 end
 
@@ -522,7 +483,7 @@ class Battle::Move::HealUserPositionNextTurn < Battle::Move
     @battle.positions[user.index].effects[PBEffects::Wish]       = 2
 	if [:MistyTerrain].include?(@battle.field.terrain)
     @battle.positions[user.index].effects[PBEffects::WishAmount] = (user.totalhp * 3 / 4.0).round
-	@battle.pbDisplay(_INTL("The mist enhanced the healing effect."))
+	# @battle.pbDisplay(_INTL("The mist enhanced the healing effect."))
 	else
 	@battle.positions[user.index].effects[PBEffects::WishAmount] = (user.totalhp / 2.0).round
 	end
@@ -572,7 +533,7 @@ class Battle::Move::UserFaintsExplosive < Battle::Move
       end
     end
 	if [:MistyTerrain].include?(@battle.field.terrain)
-	@battle.pbDisplay(_INTL("{1} cannot use {2} in the mist!", user.pbThis, @name))
+	@battle.pbDisplay(_INTL("The damp mist prevented the explosion..."))
 	return true
 	end
     return false
@@ -1192,8 +1153,44 @@ end
 # Wild Charge
 class Battle::Move::RecoilQuarterOfDamageDealt < Battle::Move::RecoilMove
   def pbRecoilDamage(user, target)
-    return (target.damageState.totalHPLost / 8.0).round if [:ElectricTerrain].include?(user.battle.field.terrain)
+    return (target.damageState.totalHPLost / 8.0).round if [:ElectricTerrain].include?(user.battle.field.terrain) && [:WILDCHARGE].include?(@id)
     return (target.damageState.totalHPLost / 4.0).round
+  end
+end
+
+# Cosmic Power
+class Battle::Move::RaiseUserDefSpDef1 < Battle::Move::MultiStatUpMove
+  def initialize(battle, move)
+    super
+    if [:COSMICPOWER].include?(@id) && [:MistyTerrain].include?(battle.field.terrain)
+      @statUp = [:DEFENSE, 2, :SPECIAL_DEFENSE, 2]
+    else
+      @statUp = [:DEFENSE, 1, :SPECIAL_DEFENSE, 1]
+    end
+  end
+end
+
+# Eerie Impulse
+class Battle::Move::LowerTargetSpAtk2 < Battle::Move::TargetStatDownMove
+  def initialize(battle, move)
+    super
+    if [:ElectricTerrain].include?(battle.field.terrain)
+      @statDown = [:SPECIAL_ATTACK, 3]
+    else
+      @statDown = [:SPECIAL_ATTACK, 2]
+    end
+  end
+end
+
+# Cotton Spore
+class Battle::Move::LowerTargetSpeed2 < Battle::Move::TargetStatDownMove
+  def initialize(battle, move)
+    super
+    if [:GrassyTerrain].include?(battle.field.terrain) && [:COTTONSPORE].include?(@id)
+      @statDown = [:SPEED, 3]
+    else
+      @statDown = [:SPEED, 2]
+    end
   end
 end
 

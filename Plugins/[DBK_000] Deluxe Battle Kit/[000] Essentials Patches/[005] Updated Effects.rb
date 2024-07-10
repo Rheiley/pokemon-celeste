@@ -698,8 +698,11 @@ end
 class Battle::Move::UserLosesHalfOfTotalHPExplosive < Battle::Move
   alias dx_pbMoveFailed? pbMoveFailed?
   def pbMoveFailed?(user, targets)
+    if [:MistyTerrain].include?(user.battle.field.terrain)
+      @battle.pbDisplay(_INTL("The damp mist prevented the explosion..."))
+    end
     if user.pokemon.immunities.include?(:SELFKO) && 
-       user.takesIndirectDamage? && user.real_hp <= user.real_totalhp / 2 || [:MistyTerrain].include?(user.battle.field.terrain)
+       user.takesIndirectDamage? && user.real_hp <= user.real_totalhp / 2
       @battle.pbDisplay(_INTL("But it failed!"))
       return true
     end

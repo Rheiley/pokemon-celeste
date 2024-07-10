@@ -6,85 +6,51 @@ class Battle::Move
 			when :ElectricTerrain
 				if type == :ELECTRIC && user.affectedByTerrain?
 					baseDmg *= 1.3 
-					@battle.pbDisplay(_INTL("The current strengthened the attack!"))
+					@battle.pbDisplay(_INTL("The Electric Terrain strengthened the attack!"))
 				end
-				if user.hasActiveAbility?(:HADRONENGINE) && specialMove?
-					@battle.pbShowAbilitySplash(user)
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
-					@battle.pbHideAbilitySplash(user)
+				if [:EXPLOSION, :HURRICANE, :MUDDYWATER, :SELFDESTRUCT, :SMACKDOWN, :SURF, :THOUSANDARROWS]
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The attack became hyper-charged!"))
 				end
-					if user.hasActiveAbility?(:GALVANIZE) && powerBoost
-					@battle.pbShowAbilitySplash(user)
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
-					@battle.pbHideAbilitySplash(user)
-				end	
-				if [:RISINGVOLTAGE].include?(@id) && target.affectedByTerrain?
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
-				end
-				if [:PSYBLADE].include?(@id)
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
-				end
-				
-				if user.affectedByTerrain?
-					if [:TERRAINPULSE].include?(@id)
-						@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the current!", target.pbThis))
-					end
-					if [:MAGNETBOMB].include?(@id)
-						baseDmg *= 2
-						@battle.pbDisplay(__INTL("The magnetism strengthened the attack!"))
-					end
+				if [:MAGNETBOMB].include?(@id)
+					baseDmg *= 2
+					@battle.pbDisplay(__INTL("The attack powered-up!"))
 				end
 #============================================================================= 02 Grassy Terrain
 			when :GrassyTerrain
-				if type == :GRASS
-					if user.affectedByTerrain?
-						if [:GRASSYGLIDE].include?(@id)
-							@battle.pbDisplay(_INTL("{1} moves faster on the grass!", @name))
-						end
-						baseDmg *= 1.3
-						@battle.pbDisplay(_INTL("The grass strengthened the attack!"))
-					end
+				if type == :GRASS && user.affectedByTerrain?
+					baseDmg *= 1.3
+					@battle.pbDisplay(_INTL("The Grassy Terrain strengthened the attack!"))
 				end
-				if type == :FIRE
-					if target.affectedByTerrain?
-						baseDmg *= 1.3
-						@battle.pbDisplay(_INTL("The grass below caught flame!"))
-					end
+				if type == :FIRE && target.affectedByTerrain?
+					baseDmg *= 1.3
+					@battle.pbDisplay(_INTL("The grass below caught flame!"))
 				end
 				if [:BULLDOZE, :EARTHQUAKE, :MAGNITUDE, :MUDDYWATER, :SURF].include?(@id)
-					@battle.pbDisplay(_INTL("The attack on {1} was weakened by the grass!", target.pbThis))
+					@battle.pbDisplay(_INTL("The grass softened the attack..."))
 				end
-				if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
-				end
-				if [:FAIRYWIND, SILVERWIND].include?(@id)
+				if [:FAIRYWIND, :SILVERWIND, :GUST, :ICYWIND, :OMINOUSWIND, :RAZORWIND, :TWISTER].include?(@id)
 					baseDmg *= 1.5
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the grass!", target.pbThis))
+					@battle.pbDisplay(_INTL("The wind picked up strength from the field!", target.pbThis))
 				end
 #============================================================================= 03 Misty Terrain
 			when :MistyTerrain
-				if type == :DRAGON && target.affectedByTerrain?
+				if type == :DRAGON && user.affectedByTerrain?
 					baseDmg *= 0.5
-					@battle.pbDisplay(_INTL("The draconic power was weakened..."))
+					@battle.pbDisplay(_INTL("The Misty Terrain weakened the attack!"))
 				end
-				if user.hasActiveAbility?(:PIXILATE) && powerBoost
-					@battle.pbShowAbilitySplash(user)
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
-					@battle.pbHideAbilitySplash(user)	
+				if type == :FAIRY && user.affectedByTerrain?
+					baseDmg *= 1.3
+					@battle.pbDisplay(_INTL("The Misty Terrain strengthened the attack!"))
 				end
-				if [:MISTYEXPLOSION].include?(@id)
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
-				end
-				if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
-				end
-				if [:AURASPHERE, :DAZZLINGGLEAM, :DOOMDESIRE, :FAIRYWIND, :ICYWIND, :MAGICALLEAF, :MISTBALL, :MOONBLAST, :MOONGEISTBEAM, :MYSTICALFIRE, :SILVERWIND, :STEAMERUPTION].include?(@id)
+				if [:AURASPHERE, :DAZZLINGGLEAM, :DOOMDESIRE, :FAIRYWIND, :ICYWIND, :MAGICALLEAF, :MISTBALL, :MOONBLAST, 
+					:MOONGEISTBEAM, :MYSTICALFIRE, :SILVERWIND, :STEAMERUPTION, :STRANGESTEAM, :SPRINGTIDESTORM].include?(@id)
 					baseDmg *= 1.5
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the mist!", target.pbThis))
+					@battle.pbDisplay(_INTL("The mist's energy strengthened the attack!"))
 				end
 				if [:DARKPULSE, :NIGHTDAZE, :SHADOWBALL].include?(@id)
 					baseDmg *= 0.5
-					@battle.pbDisplay(_INTL("The attack on {1} was cleansed!", target.pbThis))
+					@battle.pbDisplay(_INTL("The mist softened the attack..."))
 				end
 #============================================================================= 04 Psychic Terrain
 			when :PsychicTerrain

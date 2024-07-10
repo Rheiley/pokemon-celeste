@@ -8,10 +8,10 @@ class Battle::Move
       ret = Battle::AbilityEffects.triggerModifyMoveBaseType(user.ability, user, self, ret)
     end
 #=============================================================================
-    #if [:RockyField].include?(@battle.field.terrain) && GameData::Type.exists?(:ROCK) && 
-	#   [:EARTHQUAKE, :MAGNITUDE, :ROCKCLIMB, :STRENGTH, :BULLDOZE, :HEADBUTT].include?(@id)
-	#ret = :ROCK
-	#end
+    # if [:RockyField].include?(@battle.field.terrain) && GameData::Type.exists?(:ROCK) && 
+	  # [:EARTHQUAKE, :MAGNITUDE, :ROCKCLIMB, :STRENGTH, :BULLDOZE, :HEADBUTT].include?(@id)
+		# 	ret = :ROCK
+		# end
 #=============================================================================
     return ret
   end
@@ -32,17 +32,17 @@ class Battle::Move
 	end
 
 #============================================================================= 
-=begin	
-	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # multiply type effectiveness cal
-       ret *= Effectiveness.calculate(:WATER, defType)
-    end
-	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # additional type effectiveness cal
-       ret += Effectiveness.calculate(:WATER, defType)
-    end	
-	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # change type effectiveness cal
-       ret = Effectiveness.calculate(:WATER, defType)
-    end
-=end
+# =begin	
+# 	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # multiply type effectiveness cal
+#        ret *= Effectiveness.calculate(:WATER, defType)
+#     end
+# 	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # additional type effectiveness cal
+#        ret += Effectiveness.calculate(:WATER, defType)
+#     end	
+# 	if GameData::Type.exists?(:WATER) && moveType == :ELECTRIC # change type effectiveness cal
+#        ret = Effectiveness.calculate(:WATER, defType)
+#     end
+# =end
 #=============================================================================
 
 #============================================================================= 05 Inverse Field
