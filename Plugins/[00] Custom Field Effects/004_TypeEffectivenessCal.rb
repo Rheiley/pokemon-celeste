@@ -67,7 +67,10 @@ class Battle::Move
 	end
 #============================================================================= 07 Corrosive Field
 	if [:CorrosiveField].include?(@battle.field.terrain)
-		if ([:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS].include?(@id) || moveType == :GRASS) && GameData::Type.exists?(:POISON)
+		if ([:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS, :APPLEACID].include?(@id) || moveType == :GRASS) && GameData::Type.exists?(:POISON)
+			ret *= Effectiveness.calculate(:POISON, defType)
+		end
+		if @type == :GRASS
 			ret *= Effectiveness.calculate(:POISON, defType)
 		end
 	end

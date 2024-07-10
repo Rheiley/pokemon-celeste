@@ -65,7 +65,7 @@ Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
 # Toxic Boost
 Battle::AbilityEffects::DamageCalcFromUser.add(:TOXICBOOST,
   proc { |ability, user, target, move, mults, power, type|
-    if user.poisoned? && move.physicalMove? || user.battle.field.terrain == :CorrosiveField
+    if user.poisoned? && move.physicalMove? || [:CorrosiveField].include?(user.battle.field.terrain)
       mults[:power_multiplier] *= 1.5
     end
   }
@@ -80,9 +80,9 @@ Battle::AbilityEffects::EndOfRoundHealing.add(:POISONHEAL,
 		battle.pbDisplay(_INTL("{1} recovered HP from its poisoning!", battler.pbThis))
 		pb.HideAbilitySplash(battler)
 	end
-	if battle.field.terrain == :CorrosiveField
+	if [:CorrosiveField].include?(battle.field.terrain) && !battler.airborne?
 		battler.pbrecoverHP(battler.totalhp / 8, false)
-		battle.pbDisplay(__INTL("{1} recovered HP from the corrosion!", battle.pbThis))
+		battle.pbDisplay(__INTL("{1} was healed by poison!", battle.pbThis))
 	end
   }
 )
@@ -115,13 +115,104 @@ Battle::AbilityEffects::OnEndOfUsingMove.add(:GULPMISSILE,
   }
 )
 
+# Anticipation
+Battle::AbilityEffects::OnSwitchIn.add(:ANTICIPATION,
+  proc { |ability, battler, battle, switch_in|
+    next if !battler.pbOwnedByPlayer?
+    battlerTypes = battler.pbTypes(true)
+    types = battlerTypes
+    found = false
+    battle.allOtherSideBattlers(battler.index).each do |b|
+      b.eachMove do |m|
+        next if m.statusMove?
+        if types.length > 0
+          moveType = m.type
+          if Settings::MECHANICS_GENERATION >= 6 && m.function_code == "TypeDependsOnUserIVs"   # Hidden Power
+            moveType = pbHiddenPower(b.pokemon)[0]
+          end
+          eff = Effectiveness.calculate(moveType, *types)
+          next if Effectiveness.ineffective?(eff)
+          next if !Effectiveness.super_effective?(eff) &&
+                  !["OHKO", "OHKOIce", "OHKOHitsUndergroundTarget"].include?(m.function_code)
+        elsif !["OHKO", "OHKOIce", "OHKOHitsUndergroundTarget"].include?(m.function_code)
+          next
+        end
+        found = true
+        break
+      end
+      break if found
+    end
+    if found
+      battle.pbShowAbilitySplash(battler)
+      battle.pbDisplay(_INTL("{1} shuddered with anticipation!", battler.pbThis))
+      battler.pbRaiseStatStage(:SPECIAL_ATTACK, 2, battler) 
+      battle.pbHideAbilitySplash(battler)
+    end
+  }
+)
+
+# Forewarn
+Battle::AbilityEffects::OnSwitchIn.add(:FOREWARN,
+  proc { |ability, battler, battle, switch_in|
+    next if !battler.pbOwnedByPlayer?
+    highestPower = 0
+    forewarnMoves = []
+    battle.allOtherSideBattlers(battler.index).each do |b|
+      b.eachMove do |m|
+        power = m.power
+        power = 160 if ["OHKO", "OHKOIce", "OHKOHitsUndergroundTarget"].include?(m.function_code)
+        power = 150 if ["PowerHigherWithUserHP"].include?(m.function_code)    # Eruption
+        # Counter, Mirror Coat, Metal Burst
+        power = 120 if ["CounterPhysicalDamage",
+                        "CounterSpecialDamage",
+                        "CounterDamagePlusHalf"].include?(m.function_code)
+        # Sonic Boom, Dragon Rage, Night Shade, Endeavor, Psywave,
+        # Return, Frustration, Crush Grip, Gyro Ball, Hidden Power,
+        # Natural Gift, Trump Card, Flail, Grass Knot
+        power = 80 if ["FixedDamage20",
+                       "FixedDamage40",
+                       "FixedDamageUserLevel",
+                       "LowerTargetHPToUserHP",
+                       "FixedDamageUserLevelRandom",
+                       "PowerHigherWithUserHappiness",
+                       "PowerLowerWithUserHappiness",
+                       "PowerHigherWithUserHP",
+                       "PowerHigherWithTargetFasterThanUser",
+                       "TypeAndPowerDependOnUserBerry",
+                       "PowerHigherWithLessPP",
+                       "PowerLowerWithUserHP",
+                       "PowerHigherWithTargetWeight"].include?(m.function_code)
+        power = 80 if Settings::MECHANICS_GENERATION <= 5 && m.function_code == "TypeDependsOnUserIVs"
+        next if power < highestPower
+        forewarnMoves = [] if power > highestPower
+        forewarnMoves.push(m.name)
+        highestPower = power
+      end
+    end
+    if forewarnMoves.length > 0
+      battle.pbShowAbilitySplash(battler)
+      forewarnMoveName = forewarnMoves[battle.pbRandom(forewarnMoves.length)]
+      if Battle::Scene::USE_ABILITY_SPLASH
+        battle.pbDisplay(_INTL("{1} was alerted to {2}!",
+        battler.pbThis, forewarnMoveName))
+        battler.pbRaiseStatStage(:SPECIAL_ATTACK, 2, battler) 
+      else
+        battle.pbDisplay(_INTL("{1}'s Forewarn alerted it to {2}!",
+        battler.pbThis, forewarnMoveName))
+        battler.pbRaiseStatStage(:SPECIAL_ATTACK, 2, battler) 
+      end
+      battle.pbHideAbilitySplash(battler)
+    end
+  }
+)
+
 
 # Grassy Surge
 Battle::AbilityEffects::OnSwitchIn.add(:GRASSYSURGE,
   proc { |ability, battler, battle, switch_in|
 	next if ![:None, :ElectricTerrain, :MistyTerrain, :PsychicTerrain].include?(battle.field.terrain)
     battle.pbShowAbilitySplash(battler)
-	pbWait(0.5)
+	  pbWait(0.5)
     battle.pbStartTerrain(battler, :GrassyTerrain)
   }
 )
@@ -129,7 +220,18 @@ Battle::AbilityEffects::OnSwitchIn.add(:GRASSYSURGE,
 # Grass Pelt
 Battle::AbilityEffects::DamageCalcFromTarget.add(:GRASSPELT,
   proc { |ability, user, target, move, mults, power, type|
-    mults[:defense_multiplier] *= 1.5 if user.battle.field.terrain == :GrassyTerrain
+    mults[:defense_multiplier] *= 1.5 if [:GrassyTerrain].include?(user.battle.field.terrain)
+  }
+)
+
+# Power Spot
+Battle::AbilityEffects::DamageCalcFromAlly.add(:POWERSPOT,
+  proc { |ability, user, target, move, mults, power, type|
+    if [:PsychicTerrain].include?(user.battle.field.terrain)
+      mults[:final_damage_multiplier] *= 1.5
+    else
+      mults[:final_damage_multiplier] *= 1.3
+    end
   }
 )
 
@@ -190,13 +292,13 @@ Battle::AbilityEffects::DamageCalcFromTarget.add(:MARVELSCALE,
 Battle::AbilityEffects::OnBattlerFainting.add(:SOULHEART,
   proc { |ability, battler, fainted, battle|
     if [:MistyTerrain].include?(battle.field.terrain)
-	battle.pbShowAbilitySplash(battler)
-    battler.pbRaiseStatStage(:SPECIAL_ATTACK, 1, battler)
-	battler.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, battler, false)
-	battle.pbHideAbilitySplash(battler)
-	else
-    battler.pbRaiseStatStageByAbility(:SPECIAL_ATTACK, 1, battler)
-	end  
+      battle.pbShowAbilitySplash(battler)
+      battler.pbRaiseStatStageByAbility(:SPECIAL_ATTACK, 1, battler)
+      battler.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, battler)
+      battle.pbHideAbilitySplash(battler)
+    else
+      battler.pbRaiseStatStageByAbility(:SPECIAL_ATTACK, 1, battler)
+    end  
   }
 )
 
@@ -347,10 +449,7 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:AERILATE,
 Battle::AbilityEffects::EndOfRoundEffect.add(:MOTORDRIVE,
   proc { |ability, battler, battle|
     if [:ElectricTerrain].include?(battler.battle.field.terrain)
-		battle.pbShowAbilitySplash(battler)
-        battle.pbDisplay(_INTL("{1} is charged by the electricity!", battler.pbThis))
-		battler.pbRaiseStatStage(:SPEED, 1, battler)
-		battle.pbHideAbilitySplash(battler)
+      battler.pbRaiseStatStageByAbility(:SPEED, 1, battler)
     end
   }
 )

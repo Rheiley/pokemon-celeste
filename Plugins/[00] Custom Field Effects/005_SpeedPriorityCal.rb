@@ -16,19 +16,32 @@ class Battle::Battler
 =end
 #=============================================================================
 # Terrain-Based Speed Calculation
-	speedMult *= 2 if [:ElectricTerrain].include?(@battle.field.terrain) && hasActiveAbility?(:SURGESURFER)
-=begin
-    if pbHasType?(:ELECTRIC)
-	if isSpecies?(:PIKACHU)
-	if hasActiveItem?(:)
-=end
-#=============================================================================
+#============================================================================= 
+
+#============================================================================= Electric Terrain
+    if [:ElectricTerrain].include?(@battle.field.terrain)
+      if hasActiveAbility?(:SURGESURFER)
+        speedMult *= 2
+      end
+    end
+#============================================================================= Grassy Terrain
+
+#============================================================================= Misty Terrain
+
+#============================================================================= Psychic Terrain
+    if [:PsychicTerrain].include?(@battle.field.terrain)
+      if hasActiveAbility?(:TELEPATHY)
+        speedMult *= 2
+      end
+    end
+#============================================================================= 
+
+#============================================================================= 
     return [(speed * speedMult).round, 1].max
-    ret = fieldEffects_pbSpeed
-    ret
+    # ret = fieldEffects_pbSpeed
+    # ret
   end
 end
-
 #=============================================================================
 # Priority Calculation
 #=============================================================================

@@ -14,32 +14,38 @@ class Battle::Move
     modifiers[:accuracy_stage] = user.stages[:ACCURACY]
     modifiers[:evasion_stage]  = target.stages[:EVASION]
     modifiers[:accuracy_multiplier] = 1.0
-	modifiers[:evasion_multiplier]  = 1.0
+	  modifiers[:evasion_multiplier]  = 1.0
     pbCalcAccuracyModifiers(user, target, modifiers)
     # Check if move can't miss
     return true if modifiers[:base_accuracy] == 0
 #============================================================================= 06 Grassy Field
-	if [:GrassyField].include?(@battle.field.terrain) && [:GRASSWHISTLE].include?(@id)
-		modifiers[:base_accuracy] == 80
+	if [:GrassyTerrain].include?(@battle.field.terrain) && [:GRASSWHISTLE].include?(@id)
+		modifiers[:base_accuracy] = 80
 	end
 #============================================================================= 07 Misty Field
-	if [:MistyField].include?(@battle.field.terrain) && [:SWEETKISS].include?(@id)
-		modifiers[:base_accuracy] == 100
+	if [:MistyTerrain].include?(@battle.field.terrain) && [:SWEETKISS].include?(@id)
+		modifiers[:base_accuracy] = 100
 	end
 #============================================================================= 08 Psychic Field
-	if [:PsychicField].include?(@battle.field.terrain) && [:HYPNOSIS].include?(@id)
-		modifiers[:base_accuracy] == 90
+	if [:PsychicTerrain].include?(@battle.field.terrain)
+    if [:HYPNOSIS].include?(@id)
+		  modifiers[:base_accuracy] = 90
+    elsif [:MYSTICALPOWER].include?(@id)
+      modifiers[:base_accuracy] = 100
+    elsif statusMove? && target.hasActiveAbility?(:MAGICIAN)
+      modifiers[:base_accuracy] = 50
+    end
 	end
 #============================================================================= 10 Rocky Field
 	if [:RockyField].include?(@battle.field.terrain)
 		if [:STONEEDGE, :HEADSMASH].include?(@id)
-			modifiers[:base_accuracy] == 90
+			modifiers[:base_accuracy] = 90
 		end
 		if [:ROCKTHROW, :ROCKSLIDE, :ROLLOUT, :ROCKBLAST, :ROCKWRECKER].include?(@id)
-			modifiers[:base_accuracy] == 95
+			modifiers[:base_accuracy] = 95
 		end
 		if [:ROCKTOMB, :DIAMONDSTORM, :METEORBEAM, :STONEAXE].include?(@id)
-			modifiers[:base_accuracy] == 100
+			modifiers[:base_accuracy] = 100
 		end
 	end
 #============================================================================= 11 Corrosive Field

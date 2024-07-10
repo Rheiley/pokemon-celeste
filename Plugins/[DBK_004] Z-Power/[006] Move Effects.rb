@@ -66,7 +66,7 @@ end
 #-------------------------------------------------------------------------------
 class Battle::ZMove::DamageTargetStartPsychicTerrain < Battle::Move
   def pbAdditionalEffect(user, target)
-    @battle.pbStartTerrain(user, :Psychic)
+    @battle.pbStartTerrain(user, :PsychicTerrain)
   end
 end
 
@@ -78,13 +78,13 @@ end
 class Battle::ZMove::DamageTargetRemoveTerrain < Battle::Move
   def pbAdditionalEffect(user, target)
     case @battle.field.terrain
-    when :Electric
+    when :ElectricTerrain
       @battle.pbDisplay(_INTL("The electricity disappeared from the battlefield."))
-    when :Grassy
+    when :GrassyTerrain
       @battle.pbDisplay(_INTL("The grass disappeared from the battlefield."))
-    when :Misty
+    when :MistyTerrain
       @battle.pbDisplay(_INTL("The mist disappeared from the battlefield."))
-    when :Psychic
+    when :PsychicTerrain
       @battle.pbDisplay(_INTL("The weirdness disappeared from the battlefield."))
     end
     @battle.field.terrain = :None

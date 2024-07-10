@@ -89,7 +89,7 @@ class Battle::Battler
 #===============================================================================
     if [:PsychicTerrain].include?(@battle.field.terrain) && target.affectedByTerrain? &&
 	   target.opposes?(user) && @battle.choices[user.index][4] > 0 # Move priority saved from pbCalculatePriority
-	   @battle.pbDisplay(_INTL("{1} surrounds itself with psychic battlefield!", target.pbThis(true))) if show_message
+	   @battle.pbDisplay(_INTL("{1} surrounds itself with psychic energy!", target.pbThis(true))) if show_message
     return false
     end
 #===============================================================================

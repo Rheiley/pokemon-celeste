@@ -20,7 +20,7 @@ class Battle
       when :ElectricTerrain         then pbDisplay(_INTL("An electric current is running across the battlefield!")) # 01
       when :GrassyTerrain           then pbDisplay(_INTL("Grass is covering the battlefield!"))                     # 02
       when :MistyTerrain            then pbDisplay(_INTL("Mist swirls about the battlefield!"))	                    # 03
-      when :PsychicTerrain          then pbDisplay(_INTL("The battlefield is weird!"))                              # 04
+      when :PsychicTerrain          then pbDisplay(_INTL("The field became mysterious!"))                           # 04
       when :InverseField    		    then pbDisplay(_INTL("!trats elttaB"))                                          # 05
       when :RockyField	  		      then pbDisplay(_INTL("The field is littered with rocks!"))                      # 06
       when :CorrosiveField  		    then pbDisplay(_INTL("The field is corrupted!"))                                # 07
@@ -390,16 +390,16 @@ end
 #=============================================================================
 class Battle::Scene
   def pbSetFieldBackground
-     if @battle.field.terrain == :None
-     pbCreateBackdropSprites
+     if [:None].include?(@battle.field.terrain)
+      pbCreateBackdropSprites
      end
      if @battle.field.terrain != :None
-	 terrain_data = GameData::BattleTerrain.try_get(@battle.field.terrain)
-	 fieldName = terrain_data.name
-	 root = "Graphics/Fieldbacks/"
-	 @sprites["battle_bg"].setBitmap("#{root}/#{fieldName + "_bg"}".downcase) 
-	 @sprites["base_0"].setBitmap("#{root}/#{fieldName + "_base0"}".downcase) # enemy base
-	 @sprites["base_1"].setBitmap("#{root}/#{fieldName + "_base1"}".downcase) # player base
+      terrain_data = GameData::BattleTerrain.try_get(@battle.field.terrain)
+      fieldName = terrain_data.name
+      root = "Graphics/Fieldbacks/"
+      @sprites["battle_bg"].setBitmap("#{root}/#{fieldName + "_bg"}".downcase) 
+      @sprites["base_0"].setBitmap("#{root}/#{fieldName + "_base0"}".downcase) # enemy base
+      @sprites["base_1"].setBitmap("#{root}/#{fieldName + "_base1"}".downcase) # player base
      end 
   end
 end

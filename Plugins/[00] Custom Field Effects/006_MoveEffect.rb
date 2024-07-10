@@ -11,7 +11,7 @@ class Battle::Battler
       end
     end
     if [:ElectricTerrain].include?(@battle.field.terrain) 
-      if [:MUDSPORT, :TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
+      if [:TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
         @battle.pbDisplay(_INTL("The hyper-charged terrain shorted out!"))
         @battle.pbStartTerrain(user, :None, false)
       end
@@ -75,63 +75,36 @@ class Battle::Battler
       if user.affectedByTerrain?
         if [:CRUNCH].include?(move.id)
           @battle.pbDisplay(_INTL("The weirdness is gone!"))
-          @battle.field.terrain = :None
+          @battle.pbStartTerrain(user, :None, false)
         end
       end
     end
 #============================================================================= 05 Inverse Field
     if ![:InverseField].include?(@battle.field.terrain)
-      if [:WONDERROOM].include?(move.id)
+      if [:WONDERROOM, :TOPSYTURVY].include?(move.id)
         @battle.pbStartTerrain(user, :InverseField)
       end
     end
     if [:InverseField].include?(@battle.field.terrain) 
       if user.affectedByTerrain?
-        if[:MAGICROOM].include?(move.id)
+        if[:TOPSYTURVY].include?(move.id)
           @battle.pbDisplay(_INTL("!dne elttaB"))
-          @battle.field.terrain = :None
+          @battle.pbStartTerrain(user, :None, false)
         end
       end
     end
 #============================================================================= 06 Rocky Field
     if [:RockyField].include?(@battle.field.terrain)
-      if [:SANDSTORM].include?(move.id)
-        @battle.pbStartTerrain(user, :RockyField)
-      end
-      if user.affectedByTerrain?
-        if [:ROCKPOLISH].include?(move.id) && user.pbCanRaiseStatStage?(:SPEED, user, self)
-          user.pbRaiseStatStage(:SPEED, 1, user)
-        end
-        if [:ROCK].include?(move.type) && [:Sandstorm].include?(user.effectiveWeather)
-          targets.each do |b|
-            next if b.damageState.unaffected
-            next if b.pbHasType?(:ROCK)
-            next if !b.pbCanLowerStatStage?(:ACCURACY, user, self)
-            b.pbLowerStatStage(:ACCURACY, 1, user)
-          end
-        end
-        if [:SPLINTEREDSTORMSHARDS].include?(move.id)
-          #targets.each do |b|
-          #next if b.damageState.unaffected	
-          @battle.pbDisplay(_INTL("The field was terminated!"))
-          @battle.pbStartTerrain(user, :None)
-          #end
-        end
+      if [:SPLINTEREDSTORMSHARDS].include?(move.id)
+        @battle.pbDisplay(_INTL("The field was terminated!"))
+        @battle.pbStartTerrain(user, :None, false)
       end
     end
 #============================================================================= 07 Corrosive Field
     if [:CorrosiveField].include?(@battle.field.terrain)
-      if [:ACIDARMOR].include?(move.id) && user.affectedByTerrain?
-        user.pbCanRaiseStatStage?(:SPEED, user, self)
-        @battle.pbDisplay(_INTL("The corrosion enhanced the effect!"))
-        user.pbRaiseStatStage(:DEFENSE, 1, user)
-      end
-      if [:SEEDFLARE].include?(move.id)
-        #targets.each do |b|
-          #next if b.damageState.unaffected	
-        @battle.pbDisplay(_INTL("The corrosion was purified!"))
+      if [:SEEDFLARE, :PURIFY].include?(move.id)
+        @battle.pbDisplay(_INTL("The polluted field was purified!"))
         @battle.pbStartTerrain(user, :GrassyTerrain)
-        #end
       end
     end
 #=============================================================================
@@ -161,6 +134,31 @@ end
 #===============================================================================
 # Move Affected
 #=============================================================================== 
+
+# Acid Armor
+class Battle::Move::RaiseUserDefense2 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:ACIDARMOR].include?(@id) && [:CorrosiveField].include?(battle.field.terrain)
+      @statUp = [:DEFENSE, 3]
+    else
+      @statUp = [:DEFENSE, 2]
+    end
+  end
+end
+
+# Rock Polish
+class Battle::Move::RaiseUserSpeed2 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:ROCKPOLISH].include?(@id) && [:RockyField].include?(battle.field.terrain)
+      @statUp = [:SPEED, 3]
+    else
+      @statUp = [:SPEED, 2]
+    end
+  end
+end
+
 # Electric Terrain
 class Battle::Move::StartElectricTerrain < Battle::Move
   def pbMoveFailed?(user, targets)
@@ -251,16 +249,16 @@ end
 class Battle::Move::RaiseUserSpDef1PowerUpElectricMove < Battle::Move::StatUpMove
   def initialize(battle, move)
     super
-	  @statUp = [:SPECIAL_DEFENSE, 1]
+    if [:ElectricTerrain].include?(battle.field.terrain)
+      @statUp = [:SPECIAL_DEFENSE, 2]
+    else
+      @statUp = [:SPECIAL_DEFENSE, 1]
+    end
   end
 
   def pbEffectGeneral(user)
     user.effects[PBEffects::Charge] = 2
     @battle.pbDisplay(_INTL("{1} began charging power!", user.pbThis))
-    if [:ElectricTerrain].include?(@battle.field.terrain)
-      user.pbRaiseStatStage(:SPECIAL_DEFENSE, 1, user) 
-      @battle.pbDisplay(_INTL("The current enhanced the effect!"))
-    end
     super
   end
 end
@@ -314,7 +312,7 @@ class Battle::Move::HealTargetDependingOnGrassyTerrain < Battle::Move
        hpGain = (target.totalhp / 2.0).round
        target.pbRecoverHP(hpGain)
 	end
-	target.pbPoison(nil, _INTL("{1} was poisoned by the corroded flowers!", target.pbThis), true) if [:CorrosiveField].include?(@battle.field.terrain) && !target.poisoned?
+	  target.pbPoison(nil, _INTL("{1} was poisoned by the corroded flowers!", target.pbThis), true) if [:CorrosiveField].include?(@battle.field.terrain) && !target.poisoned?
     @battle.pbDisplay(_INTL("{1}'s HP was restored.", target.pbThis))
   end
 end
@@ -725,6 +723,8 @@ class Battle::Move::TypeAndPowerDependOnTerrain < Battle::Move
       ret = :FAIRY         if GameData::Type.exists?(:FAIRY)
     when :PsychicTerrain
       ret = :PSYCHIC       if GameData::Type.exists?(:PSYCHIC)
+    when :InverseField
+      ret = :NORMAL      if GameData::Type.exists?(:NORMAL)
     when :RockyField
       ret = :ROCK          if GameData::Type.exists?(:ROCK)
     when :CorrosiveField 
@@ -765,10 +765,12 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
         @npMove = :MOONBLAST     if GameData::Move.exists?(:MOONBLAST)
       when :PsychicTerrain
         @npMove = :PSYCHIC       if GameData::Move.exists?(:PSYCHIC)
+      when :InverseField
+        @npMove = :TRICKROOM     if GameData::Move.exists?(:TRICKROOM)
       when :RockyField
         @npMove = :ROCKSMASH     if GameData::Move.exists?(:ROCKSMASH)
       when :CorrosiveField
-        @npMove = :ACIDSPRAY	if GameData::Move.exists?(:ACIDSPRAY)
+        @npMove = :ACIDSPRAY	   if GameData::Move.exists?(:ACIDSPRAY)
     else
       try_move = nil
       case @battle.environment
@@ -870,59 +872,62 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
     chance = pbAdditionalEffectChance(user, target)
     return if @battle.pbRandom(100) >= chance
     case @secretPower
-    when 2
-      target.pbSleep if target.pbCanSleep?(user, false, self)
-    when 10
-      target.pbBurn(user) if target.pbCanBurn?(user, false, self)
-    when 0, 1
-      target.pbParalyze(user) if target.pbCanParalyze?(user, false, self)
-    when 9
-      target.pbFreeze if target.pbCanFreeze?(user, false, self)
-    when 5
-      if target.pbCanLowerStatStage?(:ATTACK, user, self)
-        target.pbLowerStatStage(:ATTACK, 1, user)
-      end
-    when 14
-      if target.pbCanLowerStatStage?(:DEFENSE, user, self)
-        target.pbLowerStatStage(:DEFENSE, 1, user)
-      end
-    when 3
-      if target.pbCanLowerStatStage?(:SPECIAL_ATTACK, user, self)
-        target.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
-      end
-    when 4, 6, 12
-      if target.pbCanLowerStatStage?(:SPEED, user, self)
-        target.pbLowerStatStage(:SPEED, 1, user)
-      end
-    when 8
-      if target.pbCanLowerStatStage?(:ACCURACY, user, self)
-        target.pbLowerStatStage(:ACCURACY, 1, user)
-      end
-    when 7, 11, 13
-      target.pbFlinch(user)
-	when 15
-	  target.pbPoison if taarget.pbCanPoison?(user, false, self)
+      when 2
+        target.pbSleep if target.pbCanSleep?(user, false, self)
+      when 10
+        target.pbBurn(user) if target.pbCanBurn?(user, false, self)
+      when 0, 1
+        target.pbParalyze(user) if target.pbCanParalyze?(user, false, self)
+      when 9
+        target.pbFreeze if target.pbCanFreeze?(user, false, self)
+      when 5
+        if target.pbCanLowerStatStage?(:ATTACK, user, self)
+          target.pbLowerStatStage(:ATTACK, 1, user)
+        end
+      when 14
+        if target.pbCanLowerStatStage?(:DEFENSE, user, self)
+          target.pbLowerStatStage(:DEFENSE, 1, user)
+        end
+      when 3
+        if target.pbCanLowerStatStage?(:SPECIAL_ATTACK, user, self)
+          target.pbLowerStatStage(:SPECIAL_ATTACK, 1, user)
+        end
+      when 4, 6, 12
+        if target.pbCanLowerStatStage?(:SPEED, user, self)
+          target.pbLowerStatStage(:SPEED, 1, user)
+        end
+      when 8
+        if target.pbCanLowerStatStage?(:ACCURACY, user, self)
+          target.pbLowerStatStage(:ACCURACY, 1, user)
+        end
+      when 7, 11, 13
+        target.pbFlinch(user)
+      when 15
+        target.pbPoison if target.pbCanPoison?(user, false, self)
+      when 16
+        target.pbConfuse if target.pbCanConfuse?(user, false, self)
     end
   end
 
   def pbShowAnimation(id, user, targets, hitNum = 0, showAnimation = true)
     id = :BODYSLAM   # Environment-specific anim
     case @secretPower
-    when 1  then id = :THUNDERSHOCK if GameData::Move.exists?(:THUNDERSHOCK)
-    when 2  then id = :VINEWHIP if GameData::Move.exists?(:VINEWHIP)
-    when 3  then id = :FAIRYWIND if GameData::Move.exists?(:FAIRYWIND)
-    when 4  then id = :CONFUSIO if GameData::Move.exists?(:CONFUSION)
-    when 5  then id = :WATERPULSE if GameData::Move.exists?(:WATERPULSE)
-    when 6  then id = :MUDSHOT if GameData::Move.exists?(:MUDSHOT)
-    when 7  then id = :ROCKTHROW if GameData::Move.exists?(:ROCKTHROW)
-    when 8  then id = :MUDSLAP if GameData::Move.exists?(:MUDSLAP)
-    when 9  then id = :ICESHARD if GameData::Move.exists?(:ICESHARD)
-    when 10 then id = :INCINERATE if GameData::Move.exists?(:INCINERATE)
-    when 11 then id = :SHADOWSNEAK if GameData::Move.exists?(:SHADOWSNEAK)
-    when 12 then id = :GUST if GameData::Move.exists?(:GUST)
-    when 13 then id = :SWIFT if GameData::Move.exists?(:SWIFT)
-    when 14 then id = :PSYWAVE if GameData::Move.exists?(:PSYWAVE)
-	when 15 then id - :ACIDSPRAY if GameData::Move.exists?(:ACIDSPRAY)
+      when 1  then id = :THUNDERSHOCK if GameData::Move.exists?(:THUNDERSHOCK)
+      when 2  then id = :VINEWHIP if GameData::Move.exists?(:VINEWHIP)
+      when 3  then id = :FAIRYWIND if GameData::Move.exists?(:FAIRYWIND)
+      when 4  then id = :CONFUSION if GameData::Move.exists?(:CONFUSION)
+      when 5  then id = :WATERPULSE if GameData::Move.exists?(:WATERPULSE)
+      when 6  then id = :MUDSHOT if GameData::Move.exists?(:MUDSHOT)
+      when 7  then id = :ROCKTHROW if GameData::Move.exists?(:ROCKTHROW)
+      when 8  then id = :MUDSLAP if GameData::Move.exists?(:MUDSLAP)
+      when 9  then id = :ICESHARD if GameData::Move.exists?(:ICESHARD)
+      when 10 then id = :INCINERATE if GameData::Move.exists?(:INCINERATE)
+      when 11 then id = :SHADOWSNEAK if GameData::Move.exists?(:SHADOWSNEAK)
+      when 12 then id = :GUST if GameData::Move.exists?(:GUST)
+      when 13 then id = :SWIFT if GameData::Move.exists?(:SWIFT)
+      when 14 then id = :PSYWAVE if GameData::Move.exists?(:PSYWAVE)
+      when 15 then id = :ACIDSPRAY if GameData::Move.exists?(:ACIDSPRAY)
+      when 16 then id = :CONFUSION if GameData::Move.exists?(:CONFUSION)
     end
     super
   end
@@ -935,6 +940,7 @@ class Battle::Move::SetUserTypesBasedOnEnvironment < Battle::Move
     :GrassyTerrain   => :GRASS,
     :MistyTerrain    => :FAIRY,
     :PsychicTerrain  => :PSYCHIC,
+    :InverseField    => :NORMAL,
     :RockyField      => :ROCK,
     :CorrosiveField  => :POISON
   }
@@ -1162,10 +1168,236 @@ end
 class Battle::Move::RaiseUserDefSpDef1 < Battle::Move::MultiStatUpMove
   def initialize(battle, move)
     super
-    if [:COSMICPOWER].include?(@id) && [:MistyTerrain].include?(battle.field.terrain)
+    if [:COSMICPOWER].include?(@id) && [:MistyTerrain, :PsychicTerrain].include?(battle.field.terrain)
       @statUp = [:DEFENSE, 2, :SPECIAL_DEFENSE, 2]
     else
       @statUp = [:DEFENSE, 1, :SPECIAL_DEFENSE, 1]
+    end
+  end
+end
+
+# Calm Mind
+class Battle::Move::RaiseUserSpAtkSpDef1 < Battle::Move::MultiStatUpMove
+  def initialize(battle, move)
+    super
+    if [:CALMMIND].include?(@id) && [:PsychicTerrain].include?(battle.field.terrain)
+      @statUp = [:SPECIAL_ATTACK, 2, :SPECIAL_DEFENSE, 2]
+    else
+      @statUp = [:SPECIAL_ATTACK, 1, :SPECIAL_DEFENSE, 1]
+    end
+  end
+end
+
+# Meditate
+class Battle::Move::RaiseUserAttack1 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:MEDITATE].include?(@id) && [:PsychicTerrain].include?(battle.field.terrain)
+      @statUp = [:ATTACK, 3]
+    else
+      @statUp = [:ATTACK, 1]
+    end
+  end
+end
+
+# Psyshield Bash
+class Battle::Move::RaiseUserDefense1 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:PSYSHIELDBASH].include?(@id) && [:PsychicTerrain].include?(battle.field.terrain)
+      @statUp = [:DEFENSE, 2]
+    else
+      @statUp = [:DEFENSE, 1]
+    end
+  end
+end
+
+# Wonder Room
+class Battle::Move::StartSwapAllBattlersBaseDefensiveStats < Battle::Move
+  def pbEffectGeneral(user)
+    if @battle.field.effects[PBEffects::WonderRoom] > 0
+      @battle.field.effects[PBEffects::WonderRoom] = 0
+      @battle.pbDisplay(_INTL("Wonder Room wore off, and the Defense and Sp. Def stats returned to normal!"))
+    else
+      if [:PSYCHICTERRAIN].include?(user.battle.field.terrain)
+        @battle.field.effects[PBEffects::WonderRoom] = 8
+      else
+        @battle.field.effects[PBEffects::WonderRoom] = 5
+      end
+      @battle.pbDisplay(_INTL("It created a bizarre area in which the Defense and Sp. Def stats are swapped!"))
+    end
+  end
+
+  def pbShowAnimation(id, user, targets, hitNum = 0, showAnimation = true)
+    return if @battle.field.effects[PBEffects::WonderRoom] > 0   # No animation
+    super
+  end
+end
+
+# Esper Wing
+class Battle::Move::RaiseUserSpeed1 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:ESPERWING].include?(@id) && [:PSYCHICTERRAIN].include?(battle.field.terrain)
+      @statUp = [:SPEED, 2]
+    else
+      @statUp = [:SPEED, 1]
+    end
+  end
+end
+
+# Magic Room
+class Battle::Move::StartNegateHeldItems < Battle::Move
+  def pbEffectGeneral(user)
+    if @battle.field.effects[PBEffects::MagicRoom] > 0
+      @battle.field.effects[PBEffects::MagicRoom] = 0
+      @battle.pbDisplay(_INTL("The area returned to normal!"))
+    else
+      if [:PSYCHICTERRAIN].include?(user.battle.field.terrain)
+        @battle.field.effects[PBEffects::MagicRoom] = 8
+      else
+        @battle.field.effects[PBEffects::MagicRoom] = 5
+      end
+      @battle.pbDisplay(_INTL("It created a bizarre area in which Pokémon's held items lose their effects!"))
+    end
+  end
+
+  def pbShowAnimation(id, user, targets, hitNum = 0, showAnimation = true)
+    return if @battle.field.effects[PBEffects::MagicRoom] > 0   # No animation
+    super
+  end
+end
+
+# Trick Room
+class Battle::Move::StartSlowerBattlersActFirst < Battle::Move
+  def pbEffectGeneral(user)
+    if @battle.field.effects[PBEffects::TrickRoom] > 0
+      @battle.field.effects[PBEffects::TrickRoom] = 0
+      @battle.pbDisplay(_INTL("{1} reverted the dimensions!", user.pbThis))
+    else
+      if [:PSYCHICTERRAIN].include?(user.battle.field.terrain)
+        @battle.field.effects[PBEffects::TrickRoom] = 8
+      else
+        @battle.field.effects[PBEffects::TrickRoom] = 5
+      end
+      @battle.pbDisplay(_INTL("{1} twisted the dimensions!", user.pbThis))
+    end
+  end
+
+  def pbShowAnimation(id, user, targets, hitNum = 0, showAnimation = true)
+    return if @battle.field.effects[PBEffects::TrickRoom] > 0   # No animation
+    super
+  end
+end
+
+# Gravity
+class Battle::Move::StartGravity < Battle::Move
+  def pbMoveFailed?(user, targets)
+    if @battle.field.effects[PBEffects::Gravity] > 0
+      @battle.pbDisplay(_INTL("But it failed!"))
+      return true
+    end
+    return false
+  end
+
+  def pbEffectGeneral(user)
+    if [:PSYCHICTERRAIN].include?(user.battle.field.terrain)
+      @battle.field.effects[PBEffects::Gravity] = 8
+    else
+      @battle.field.effects[PBEffects::Gravity] = 5
+    end
+    @battle.pbDisplay(_INTL("Gravity intensified!"))
+    @battle.allBattlers.each do |b|
+      showMessage = false
+      if b.inTwoTurnAttack?("TwoTurnAttackInvulnerableInSky",
+                            "TwoTurnAttackInvulnerableInSkyParalyzeTarget",
+                            "TwoTurnAttackInvulnerableInSkyTargetCannotAct")
+        b.effects[PBEffects::TwoTurnAttack] = nil
+        @battle.pbClearChoice(b.index) if !b.movedThisRound?
+        showMessage = true
+      end
+      if b.effects[PBEffects::MagnetRise] > 0 ||
+         b.effects[PBEffects::Telekinesis] > 0 ||
+         b.effects[PBEffects::SkyDrop] >= 0
+        b.effects[PBEffects::MagnetRise]  = 0
+        b.effects[PBEffects::Telekinesis] = 0
+        b.effects[PBEffects::SkyDrop]     = -1
+        showMessage = true
+      end
+      if showMessage
+        @battle.pbDisplay(_INTL("{1} couldn't stay airborne because of gravity!", b.pbThis))
+      end
+    end
+  end
+end
+
+# Mind Reader
+class Battle::Move::EnsureNextMoveAlwaysHits < Battle::Move
+  def pbEffectAgainstTarget(user, target)
+    user.effects[PBEffects::LockOn]    = 2
+    user.effects[PBEffects::LockOnPos] = target.index
+    @battle.pbDisplay(_INTL("{1} took aim at {2}!", user.pbThis, target.pbThis(true)))
+    if [:MINDREADER].include?(@id) && [:PsychicTerrain].include?(user.battle.field.terrain)
+      user.pbRaiseStatStage(:SPECIAL_ATTACK, 2, user)
+    end
+  end
+end
+
+# Miracle Eye
+class Battle::Move::StartNegateTargetEvasionStatStageAndDarkImmunity < Battle::Move
+  def ignoresSubstitute?(user); return true; end
+  def canMagicCoat?;            return true; end
+
+  def pbEffectAgainstTarget(user, target)
+    target.effects[PBEffects::MiracleEye] = true
+    @battle.pbDisplay(_INTL("{1} was identified!", target.pbThis))
+    if [:MIRACLEEYE].include?(@id) && [:PsychicTerrain].include?(user.battle.field.terrain)
+      user.pbRaiseStatStage(:SPECIAL_ATTACK, 2, user)
+    end
+  end
+end
+
+# Telekinesis
+class Battle::Move::StartTargetAirborneAndAlwaysHitByMoves < Battle::Move
+  def unusableInGravity?; return true; end
+  def canMagicCoat?;      return true; end
+
+  def pbFailsAgainstTarget?(user, target, show_message)
+    if target.effects[PBEffects::Ingrain] ||
+       target.effects[PBEffects::SmackDown] ||
+       target.effects[PBEffects::Telekinesis] > 0
+      @battle.pbDisplay(_INTL("But it failed!")) if show_message
+      return true
+    end
+    if target.isSpecies?(:DIGLETT) ||
+       target.isSpecies?(:DUGTRIO) ||
+       target.isSpecies?(:SANDYGAST) ||
+       target.isSpecies?(:PALOSSAND) ||
+       (target.isSpecies?(:GENGAR) && target.mega?)
+      @battle.pbDisplay(_INTL("But it failed!")) if show_message
+      return true
+    end
+    return false
+  end
+
+  def pbEffectAgainstTarget(user, target)
+    target.effects[PBEffects::Telekinesis] = 3
+    @battle.pbDisplay(_INTL("{1} was hurled into the air!", target.pbThis))
+    if [:PsychicTerrain].include?(user.battle.field.terrain)
+      target.pbLowerStatStage(:DEFENSE, 2, target)
+      target.pbLowerStatStage(:SPECIAL_DEFENSE, 2, target, false)
+    end
+  end
+end
+
+# Nasty Plot
+class Battle::Move::RaiseUserSpAtk2 < Battle::Move::StatUpMove
+  def initialize(battle, move)
+    super
+    if [:NASTYPLOT].include?(@id) && [:PsychicTerrain].include?(battle.field.terrain)
+      @statUp = [:SPECIAL_ATTACK, 3]
+    else
+      @statUp = [:SPECIAL_ATTACK, 2]
     end
   end
 end

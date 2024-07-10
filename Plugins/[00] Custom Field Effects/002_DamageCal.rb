@@ -8,8 +8,8 @@ class Battle::Move
 					baseDmg *= 1.3 
 					@battle.pbDisplay(_INTL("The Electric Terrain strengthened the attack!"))
 				end
-				if [:EXPLOSION, :HURRICANE, :MUDDYWATER, :SELFDESTRUCT, :SMACKDOWN, :SURF, :THOUSANDARROWS]
-					baseDmg *= 1.5
+				if [:EXPLOSION, :HURRICANE, :MUDDYWATER, :SELFDESTRUCT, :SMACKDOWN, :SURF, :THOUSANDARROWS, :PSYBLADE].include?(@id)
+					baseDmg *= 1.5 if ![:PSYBLADE].include?(@id) # Psyblade is already boosted in ElectricTerrain (Gen 9 Pack)
 					@battle.pbDisplay(_INTL("The attack became hyper-charged!"))
 				end
 				if [:MAGNETBOMB].include?(@id)
@@ -56,46 +56,44 @@ class Battle::Move
 			when :PsychicTerrain
 				if type == :PSYCHIC && user.affectedByTerrain?
 					baseDmg *= 1.3
-					@battle.pbDisplay(_INTL("The weirdness boosted the attack!"))
+					@battle.pbDisplay(_INTL("The Psychic Terrain strengthened the attack!"))
 				end
-				if [:EXPANDINGFORCE].include?(@id) && user.affectedByTerrain?
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the weirdness!", target.pbThis))
+				if [:EXPANDINGFORCE, :TERRAINPULSE].include?(@id) && user.affectedByTerrain?
+					@battle.pbDisplay(_INTL("The psychic energy strengthened the attack!"))
 				end
-				if [:TERRAINPULSE].include?(@id) && user.affectedByTerrain?
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the weirdness!", target.pbThis))
+				if [:AURASPHERE, :FOCUSBLAST, :HEX, :HIDDENPOWER, :MAGICALLEAF, :MINDBLOWN, :MYSTICALFIRE, :SECRETPOWER].include?(@id)
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The psychic energy strengthened the attack!"))
 				end
 #============================================================================= 05 Inverse Field
-			when :InverseField
-				if type == :NORMAL && user.affectedByTerrain?
-					baseDmg *= 1.5
-					@battle.pbDisplay(_INTL("!kcatta eht detsoob dleif ehT"))
-				end
-				if user.hasActiveAbility?(:NORMALIZE) && powerBoost
-					baseDmg *= 1.25
-					@battle.pbShowAbilitySplash(user)
-					@battle.pbDisplay(_INTL("!dleif eht yb decnahne saw {1} no kcatta ehT", target.pbThis))
-					@battle.pbHideAbilitySplash(user)	
-				end
+
 #============================================================================= 06 Rocky Field
 			when :RockyField
 				if type == :ROCK && user.affectedByTerrain?
 					baseDmg *= 1.3
-					@battle.pbDisplay(_INTL("The rock boosted the attack on {1}!", target.pbThis))
+					@battle.pbDisplay(_INTL("The field strengthened the attack!"))
 				end
 				if [:ROCKSMASH].include?(@id) && user.affectedByTerrain?
 					baseDmg *= 2
-					@battle.pbDisplay(_INTL("The attack on {1} was enhanced by the rock!", target.pbThis))
+					@battle.pbDisplay(_INTL("SMASH'D!"))
+				end
+				if [:ACCELEROCK, :BULLDOZE, :EARTHQUAKE, :MAGNITUDE, :ROCKCLIMB, :STRENGTH].include?(@id) && user.affectedByTerrain?
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The rocks strengthened the attack!"))
 				end
 #============================================================================= 07 Corrosive Field
 			when :CorrosiveField
 				if [:VENOSHOCK].include?(@id)
 					baseDmg = 130
 				end
-				if [:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS].include?(@id)
+				if [:BARBBARRAGE].include?(@id)
+					baseDmg = 120
+				end
+				if [:SMACKDOWN, :MUDSLAP, :MUDSHOT, :MUDBOMB, :MUDDYWATER, :WHIRLPOOL, :THOUSANDARROWS, :APPLEACID].include?(@id)
 					@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
 					baseDmg *= 1.5
 				end
-				if [:ACID, :ACIDSPRAY, :GRASSKNOT].include?(@id)
+				if [:ACID, :ACIDSPRAY, :GRASSKNOT, :SNAPTRAP].include?(@id)
 					@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
 					baseDmg *= 2
 				end
