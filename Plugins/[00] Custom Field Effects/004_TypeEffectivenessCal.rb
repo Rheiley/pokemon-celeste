@@ -74,7 +74,12 @@ class Battle::Move
 			ret *= Effectiveness.calculate(:POISON, defType)
 		end
 	end
-#=============================================================================
+#============================================================================= 08 Corrosive Mist Field
+	if [:CorrosiveMistField].include?(@battle.field.terrain)
+		if ((moveType == :FLYING && specialMove?) || [:APPLEACID, :BUBBLE, :BUBBLEBEAM, :SPARKLINGARIA, :ENERGYBALL].include?(@id)) && GameData::Type.exists?(:POISON)
+			ret *= Effectiveness.calculate(:POISON, defType)
+		end
+	end
 #=============================================================================
     return ret
   end

@@ -31,10 +31,33 @@ class Battle
         end
       end
 	  end
-#============================================================================= 10 Rocky Field
+#============================================================================= 06 Rocky Field
     if [:RockyField].include?(@field.terrain) 
 		
 	  end
+#============================================================================= 08 Corrosive Mist Field
+    if [:CorrosiveMistField].include?(@field.terrain)
+      if battler.takesIndirectDamage? && battler.affectedByTerrain? && ![:POISON, :STEEL].include?(battler.types) && battler.pbCanPoison?(nil, false) && !battler.hasActiveAbility?(:NEUTRALIZINGGAS)
+        battler.pbPoison(nil, _INTL("{1} was poisoned by the corrosive mist!", battler.pbThis))
+      end
+      if battler.hasActiveAbility?(:DRYSKIN)
+        types = battler.pbTypes(true)
+        return if types.include?(:STEEL)
+        pbShowAbilitySplash(battler)
+        if types.include?(:POISON)
+          battler.pbRecoverHP(battler.totalhp / 8, true)
+          pbDisplay(_INTL("{1}'s HP was restored by the mist.", battler.pbThis))
+          pbHideAbilitySplash(battler)
+        else
+          battler.pbReduceHP(battler.totalhp / 8, true)
+          pbDisplay(_INTL("{1} was hurt by the mist!", battler.pbThis))
+          battler.pbItemHPHealCheck
+          pbHideAbilitySplash(battler)
+          battler.pbFaint if battler.fainted?
+        end 
+      end
+    end
+
 #=============================================================================
   end
 end
@@ -47,21 +70,19 @@ class Battle
     return if battler.fainted?
     amt = -1
     case battler.effectiveWeather
-    when :Sandstorm
-      return if !battler.takesSandstormDamage?
-      pbDisplay(_INTL("{1} is buffeted by the sandstorm!", battler.pbThis))
-#=============================================================================
-      amt = battler.totalhp / 16
-	    amt = battler.totalhp / 8 if [:RockyField].include?(@field.terrain)
-#=============================================================================
-    when :Hail
-      return if !battler.takesHailDamage?
-      pbDisplay(_INTL("{1} is buffeted by the hail!", battler.pbThis))
-	    amt = battler.totalhp / 16
-    when :ShadowSky
-      return if !battler.takesShadowSkyDamage?
-      pbDisplay(_INTL("{1} is hurt by the shadow sky!", battler.pbThis))
-      amt = battler.totalhp / 16
+      when :Sandstorm
+        return if !battler.takesSandstormDamage?
+        pbDisplay(_INTL("{1} is buffeted by the sandstorm!", battler.pbThis))
+        amt = battler.totalhp / 16
+        amt = battler.totalhp / 8 if [:RockyField].include?(@field.terrain)
+      when :Hail
+        return if !battler.takesHailDamage?
+        pbDisplay(_INTL("{1} is buffeted by the hail!", battler.pbThis))
+        amt = battler.totalhp / 16
+      when :ShadowSky
+        return if !battler.takesShadowSkyDamage?
+        pbDisplay(_INTL("{1} is hurt by the shadow sky!", battler.pbThis))
+        amt = battler.totalhp / 16
     end
     return if amt < 0
     @scene.pbDamageAnimation(battler)
@@ -198,24 +219,25 @@ class Battle
   def pbEntryHazards(battler)
     battler_side = battler.pbOwnSide
 	# Stealth Rock Overhaul
-	if battler_side.effects[PBEffects::StealthRock] && battler.takesIndirectDamage? &&
-       GameData::Type.exists?(:ROCK) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
-	   bTypes = battler.pbTypes(true)
-       eff = Effectiveness.calculate(:ROCK, *bTypes)
+    if battler_side.effects[PBEffects::StealthRock] && battler.takesIndirectDamage? &&
+        GameData::Type.exists?(:ROCK) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
+        bTypes = battler.pbTypes(true)
+        eff = Effectiveness.calculate(:ROCK, *bTypes)
 #=============================================================================
-	   if battler.pbHasType?(:ROCK) || battler.pbHasType?(:GROUND) || battler.pbHasType?(:STEEL) || battler.pbHasType?(:FIGHTING)
-	    battler_side.effects[PBEffects::StealthRock] = false
-		pbDisplay(_INTL("{1} crushed the rocks!", battler.pbThis))
-	   elsif !battler.pbHasType?(:ROCK)|| !battler.pbHasType?(:GROUND) || !battler.pbHasType?(:STEEL) || !battler.pbHasType?(:FIGHTING) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
-	   if battler_side.effects[PBEffects::StealthRock]
-	     if !Effectiveness.ineffective?(eff)
-		   battler.pbReduceHP(battler.totalhp * eff / 8, false) if [:RockyField].include?(@field.terrain)
-		   battler.pbReduceHP(battler.totalhp * eff / 14, false)
+      if battler.pbHasType?(:ROCK) || battler.pbHasType?(:GROUND) || battler.pbHasType?(:STEEL) || battler.pbHasType?(:FIGHTING)
+        battler_side.effects[PBEffects::StealthRock] = false
+        pbDisplay(_INTL("{1} crushed the rocks!", battler.pbThis))
+      elsif !battler.pbHasType?(:ROCK)|| !battler.pbHasType?(:GROUND) || !battler.pbHasType?(:STEEL) || !battler.pbHasType?(:FIGHTING) && !battler.hasActiveItem?(:HEAVYDUTYBOOTS)
+        if battler_side.effects[PBEffects::StealthRock]
+          if !Effectiveness.ineffective?(eff)
+            battler.pbReduceHP(battler.totalhp * eff / 8, false) if [:RockyField].include?(@field.terrain)
+            battler.pbReduceHP(battler.totalhp * eff / 14, false)
 #=============================================================================
-           pbDisplay(_INTL("Pointed stones dug into {1}!", battler.pbThis))
-           battler.pbItemHPHealCheck
-		 end
-		end
+            pbDisplay(_INTL("Pointed stones dug into {1}!", battler.pbThis))
+            battler.pbItemHPHealCheck
+            battler.pbFaint if battler.fainted?
+		      end
+		    end
       end
     end
 	# Spikes Tweaks
@@ -229,6 +251,7 @@ class Battle
        battler.pbReduceHP(battler.totalhp / spikesDiv, false)
        pbDisplay(_INTL("{1} is hurt by the spikes!", battler.pbThis))
        battler.pbItemHPHealCheck
+       battler.pbFaint if battler.fainted?
 	  end
 	 end
     # Toxic Spikes
@@ -253,11 +276,13 @@ class Battle
         battler.pbItemStatRestoreCheck
       end
     end
-	# Corrosive Field Entry / Residual Damage
+	# Corrosive Field Entry Damage
 	if @field.terrain == :CorrosiveField && !battler.airborne? && battler.takesIndirectDamage? && GameData::Type.exists?(:POISON) && !battler.pbHasType?(:POISON) && !battler.pbHasType?(:STEEL)
 		bTypes = battler.pbTypes(true)
 		eff = Effectiveness.calculate(:POISON, *bTypes)
 		battler.pbReduceHP(battler.totalhp * eff / 8, false)
+    battler.pbItemHPHealCheck
+    battler.pbFaint if battler.fainted?
 		pbDisplay(_INTL("{1} is hurt by the corrosion!", battler.pbThis))
 	end
 	
@@ -272,14 +297,21 @@ class Battle
     # Aqua Ring
     priority.each do |battler|
       next if !battler.effects[PBEffects::AquaRing]
-      next if !battler.canHeal?
+      next if !battler.canHeal? && ![:CorrosiveMistField].include?(battler.field.terrain)
+      next if [:POISON, :STEEL].include?(battler.pbTypes(true)) && [:CorrosiveMistField].include?(battler.field.terrain)
 #=============================================================================
       hpGain = battler.totalhp / 16
 	    hpGain = battler.totalhp / 8 if [:MistyTerrain].include?(@field.terrain)
 #=============================================================================
-      hpGain = (hpGain * 1.3).floor if battler.hasActiveItem?(:BIGROOT)
-      battler.pbRecoverHP(hpGain)
-      pbDisplay(_INTL("Aqua Ring restored {1}'s HP!", battler.pbThis(true)))
+      if [:CorrosiveMistField].include?(battler.field.terrain)
+        battler.pbReduceHP(hpGain, false)
+        pbDisplay(_INTL("{1} was hurt by the corroded aqua ring!", battler.pbThis(true)))
+        battler.pbItemHPHealCheck
+        battler.pbFaint if battler.fainted?
+      else
+        battler.pbRecoverHP(hpGain)
+        pbDisplay(_INTL("Aqua Ring restored {1}'s HP!", battler.pbThis(true)))
+      end
     end
     # Ingrain
     priority.each do |battler|

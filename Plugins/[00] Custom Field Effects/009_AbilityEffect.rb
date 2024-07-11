@@ -65,7 +65,7 @@ Battle::AbilityEffects::StatusCheckNonIgnorable.add(:COMATOSE,
 # Toxic Boost
 Battle::AbilityEffects::DamageCalcFromUser.add(:TOXICBOOST,
   proc { |ability, user, target, move, mults, power, type|
-    if user.poisoned? && move.physicalMove? || [:CorrosiveField].include?(user.battle.field.terrain)
+    if user.poisoned? && move.physicalMove? || [:CorrosiveField, :CorrosiveMistField].include?(user.battle.field.terrain)
       mults[:power_multiplier] *= 1.5
     end
   }
@@ -80,7 +80,7 @@ Battle::AbilityEffects::EndOfRoundHealing.add(:POISONHEAL,
 		battle.pbDisplay(_INTL("{1} recovered HP from its poisoning!", battler.pbThis))
 		pb.HideAbilitySplash(battler)
 	end
-	if [:CorrosiveField].include?(battle.field.terrain) && !battler.airborne?
+	if [:CorrosiveField, :CorrosiveMistField].include?(battle.field.terrain) && !battler.airborne?
 		battler.pbrecoverHP(battler.totalhp / 8, false)
 		battle.pbDisplay(__INTL("{1} was healed by poison!", battle.pbThis))
 	end
@@ -90,14 +90,14 @@ Battle::AbilityEffects::EndOfRoundHealing.add(:POISONHEAL,
 # Merciless
 Battle::AbilityEffects::CriticalCalcFromUser.add(:MERCILESS,
   proc { |ability, user, target, c|
-    next 99 if user.battle.field.terrain == :CorrosiveField || target.poisoned?
+    next 99 if [:CorrosiveField, :CorrosiveMistField].include?(user.battle.field.terrain) || target.poisoned?
   }
 )
 
 # Corrosion
 Battle::AbilityEffects::DamageCalcFromUser.add(:CORROSION,
   proc { |ability, user, target, move, mults, power, type|
-    if user.battle.field.terrain == :CorrosiveField
+    if [:CorrosiveField, :CorrosiveMistField].include?(user.battle.field.terrain)
       mults[:power_multiplier] *= 1.5
     end
   }
@@ -479,7 +479,8 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
         :MistyTerrain    => :FAIRY,
         :PsychicTerrain  => :PSYCHIC,
 		    :RockyField      => :ROCK,
-		    :CorrosiveField	 => :POISON
+		    :CorrosiveField	 => :POISON,
+        :CorrosiveMistField	 => :POISON
       }
       new_type = terrain_hash[battle.field.terrain]
       new_type_name = nil
@@ -494,6 +495,16 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
         battle.pbDisplay(_INTL("{1}'s type changed to {2}!", battler.pbThis, new_type_name))
         battle.pbHideAbilitySplash(battler)
       end
+    end
+  }
+)
+
+# Water Compaction
+Battle::AbilityEffects::OnSwitchIn.add(:WATERCOMPACTION,
+  proc { |ability, battler, battle, switch_in|
+    next if battle.field.terrain == :None
+    if [:CorrosiveMistField].include?(battle.field.terrain)
+      battler.pbRaiseStatStageByAbility(:DEFENSE, 2, battler)
     end
   }
 )

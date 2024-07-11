@@ -97,6 +97,22 @@ class Battle::Move
 					@battle.pbDisplay(_INTL("The corrosion strengthened the attack!"))
 					baseDmg *= 2
 				end
+#============================================================================= 08 Corrosive Mist Field
+			when :CorrosiveMistField
+				if type == :FIRE
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The toxic mist caught flame!"))
+				end
+				if [:ACIDSPRAY, :APPLEACID, :BUBBLE, :BUBBLEBEAM, :CLEARSMOG, :SMOG, :SPARKLINGARIA].include?(@id)
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The poison strengthened the attack!"))
+				end
+				if [:VENOSHOCK].include?(@id)
+					baseDmg = 130
+				end
+				if [:BARBBARRAGE].include?(@id)
+					baseDmg = 120
+				end
 #=============================================================================
 			end
     return baseDmg

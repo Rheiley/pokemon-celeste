@@ -61,7 +61,7 @@ class Battle::Battler
         end
         if [:CLEARSMOG, :SMOG, :POISONGAS, :ACIDDOWNPOUR].include?(move.id)
           @battle.pbDisplay(_INTL("The mist was corroded!"))
-          @battle.pbStartTerrain(user, :CorrosiveField, false) # CHANGE THIS TO CorrosiveMistField once implemented
+          @battle.pbStartTerrain(user, :CorrosiveMistField, false)
         end
       end
     end
@@ -107,6 +107,21 @@ class Battle::Battler
         @battle.pbStartTerrain(user, :GrassyTerrain)
       end
     end
+#============================================================================= 08 Corrosive Mist Field
+    if [:CorrosiveField].include?(@battle.field.terrain)
+      if [:GRAVITY].include?(move.id)
+        @battle.pbDisplay(_INTL("The toxic mist collected on the ground!"))
+        @battle.pbStartTerrain(user, :CorrosiveField, false)
+      end
+      if [:SEEDFLARE].include?(move.id)
+        @battle.pbDisplay(_INTL("The polluted mist was purified!"))
+        @battle.pbStartTerrain(user, :MistyTerrain, false)
+      end
+      if [:DEFOG, :GUST, :HURRICANE, :RAZORWIND, :SUPERSONICSKYSTRIKE, :TAILWIND, :TWISTER, :WHIRLWIND].include?(move.id)
+        @battle.pbDisplay(_INTL("The mist was blown away!"))
+        @battle.pbStartTerrain(user, :None, false)
+      end
+    end
 #=============================================================================
 =begin
 	@battle.pbDisplay(_INTL("The current is gone!"))
@@ -139,7 +154,7 @@ end
 class Battle::Move::RaiseUserDefense2 < Battle::Move::StatUpMove
   def initialize(battle, move)
     super
-    if [:ACIDARMOR].include?(@id) && [:CorrosiveField].include?(battle.field.terrain)
+    if [:ACIDARMOR].include?(@id) && [:CorrosiveField, :CorrosiveMistField].include?(battle.field.terrain)
       @statUp = [:DEFENSE, 3]
     else
       @statUp = [:DEFENSE, 2]
@@ -311,8 +326,31 @@ class Battle::Move::HealTargetDependingOnGrassyTerrain < Battle::Move
     else 
        hpGain = (target.totalhp / 2.0).round
        target.pbRecoverHP(hpGain)
-	end
-	  target.pbPoison(nil, _INTL("{1} was poisoned by the corroded flowers!", target.pbThis), true) if [:CorrosiveField].include?(@battle.field.terrain) && !target.poisoned?
+	  end
+	  target.pbPoison(nil, _INTL("{1} was poisoned by the poisonous flowers!", target.pbThis), true) if [:CorrosiveField, :CorrosiveMistField].include?(@battle.field.terrain) && !target.poisoned?
+    @battle.pbDisplay(_INTL("{1}'s HP was restored.", target.pbThis))
+  end
+end
+
+# Life Dew
+class Battle::Move::HealUserAndAlliesQuarterOfTotalHP < Battle::Move
+  def healingMove?; return true; end
+
+  def pbMoveFailed?(user, targets)
+    if @battle.allSameSideBattlers(user).none? { |b| b.canHeal? }
+      @battle.pbDisplay(_INTL("But it failed!"))
+      return true
+    end
+    return false
+  end
+
+  def pbFailsAgainstTarget?(user, target, show_message)
+    return !target.canHeal?
+  end
+
+  def pbEffectAgainstTarget(user, target)
+    target.pbPoison(nil, _INTL("{1} was poisoned by the toxic water!", target.pbThis), true) if [:CorrosiveField, :CorrosiveMistField].include?(@battle.field.terrain) && !target.poisoned?
+    target.pbRecoverHP(target.totalhp / 4)
     @battle.pbDisplay(_INTL("{1}'s HP was restored.", target.pbThis))
   end
 end
@@ -771,6 +809,8 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
         @npMove = :ROCKSMASH     if GameData::Move.exists?(:ROCKSMASH)
       when :CorrosiveField
         @npMove = :ACIDSPRAY	   if GameData::Move.exists?(:ACIDSPRAY)
+      when :CorrosiveMistField
+        @npMove = :VENOSHOCK	   if GameData::Move.exists?(:VENOSHOCK)
     else
       try_move = nil
       case @battle.environment
@@ -832,6 +872,8 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
     when :RockyField
       @secretPower = 7   # Rock Throw, flinch
     when :CorrosiveField
+      @secretPower = 15  # Acid Spray, poison
+    when :CorrosiveMistField
       @secretPower = 15  # Acid Spray, poison
     else
       case @battle.environment
@@ -942,7 +984,8 @@ class Battle::Move::SetUserTypesBasedOnEnvironment < Battle::Move
     :PsychicTerrain  => :PSYCHIC,
     :InverseField    => :NORMAL,
     :RockyField      => :ROCK,
-    :CorrosiveField  => :POISON
+    :CorrosiveField  => :POISON,
+    :CorrosiveMistField  => :POISON
   }
   ENVIRONMENT_TYPES = {
     :None        => :NORMAL,

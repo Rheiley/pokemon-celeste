@@ -18,15 +18,15 @@ class Battle::Move
     pbCalcAccuracyModifiers(user, target, modifiers)
     # Check if move can't miss
     return true if modifiers[:base_accuracy] == 0
-#============================================================================= 06 Grassy Field
+#============================================================================= 02 Grassy Field
 	if [:GrassyTerrain].include?(@battle.field.terrain) && [:GRASSWHISTLE].include?(@id)
 		modifiers[:base_accuracy] = 80
 	end
-#============================================================================= 07 Misty Field
+#============================================================================= 03 Misty Field
 	if [:MistyTerrain].include?(@battle.field.terrain) && [:SWEETKISS].include?(@id)
 		modifiers[:base_accuracy] = 100
 	end
-#============================================================================= 08 Psychic Field
+#============================================================================= 04 Psychic Field
 	if [:PsychicTerrain].include?(@battle.field.terrain)
     if [:HYPNOSIS].include?(@id)
 		  modifiers[:base_accuracy] = 90
@@ -36,7 +36,7 @@ class Battle::Move
       modifiers[:base_accuracy] = 50
     end
 	end
-#============================================================================= 10 Rocky Field
+#============================================================================= 06 Rocky Field
 	if [:RockyField].include?(@battle.field.terrain)
 		if [:STONEEDGE, :HEADSMASH].include?(@id)
 			modifiers[:base_accuracy] = 90
@@ -48,9 +48,15 @@ class Battle::Move
 			modifiers[:base_accuracy] = 100
 		end
 	end
-#============================================================================= 11 Corrosive Field
+#============================================================================= 07 Corrosive Field
 	if [:CorrosiveField].include?(@battle.field.terrain)
 		if [:POISONPOWDER, :SLEEPPOWDER, :STUNSPORE, :TOXIC].include?(@id)
+			modifiers[:base_accuracy] = 100
+		end
+	end
+  #============================================================================= 08 Corrosive Mist Field
+	if [:CorrosiveField].include?(@battle.field.terrain)
+		if [:TOXIC].include?(@id)
 			modifiers[:base_accuracy] = 100
 		end
 	end

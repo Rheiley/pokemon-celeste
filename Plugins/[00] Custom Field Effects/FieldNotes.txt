@@ -27,6 +27,9 @@ Abilities Affected:
 Moves that increase in base power by 1.5x:
 
 
+Moves that increase in base power by 2x:
+
+
 Moves that decrease in base power by 0.5x:
 
 
@@ -348,7 +351,6 @@ Transitions from Other Fields:
 General Effects:
 - Grass-type attacks gain a Poison sub-type
 - Grounded non-Poison or Steel-type Pokémon take Poison-type scaling damage on switch-in, with normal damage equal to 1/4 max HP
-- Grounded non-Poison or Steel-type Pokémon take Poison-type scaling damage at the end of each turn, with normal damage equal to 1/8 max HP
        - Pokémon take no field damage if they have one of the abilities Immunity, Magic Guard, Pastel Veil, Poison Heal, Toxic Boost, or Wonder Guard
 
 Abilities Affected:
@@ -389,3 +391,50 @@ Other Moves:
 
 Transitions to Other Fields:
 - This field will transform into Grassy Terrain if the moves Seed Flare or Purify are used
+------------------------------------------------------------------
+08 			Corrosive Mist Field
+------------------------------------------------------------------
+"Corrosive mist settles on the field!"
+
+
+Transitions from Other Fields:
+- Misty Terrain will transform into this field upon one use of the move Acid Downpour, or two uses of any of the moves Smog, Clear Smog, or Poison Gas
+
+General Effects:
+- Fire-type moves increase in base power by 1.5x.
+- Special Flying-type moves gain a Poison sub-type.
+- All non-Poison or Steel-type Pokémon on the field are poisoned at the end of each turn unless Neutralizing Gas is active
+
+
+Abilities Affected:
+- Corrosion additionally boosts damage by 1.5x
+- Dry Skin additionally causes the bearer to lose 1/8 max HP each turn if it isn't Poison or Steel-type, and recover 1/8 of its maximum HP each turn if it is Poison-type
+- Merciless and Toxic Boost are always activated
+- Mimicry changes the user's type to Poison
+- Poison Heal additionally heals the bearer for 1/8 max HP at the end of each turn
+- Water Compaction is activated on switch in
+
+Moves that increase in base power by 1.5x and gain Poison as a secondary type if applicable:
+- Acid Spray
+- Apple Acid
+- Bubble
+- Bubble Beam
+- Clear Smog
+- Smog
+- Sparkling Aria
+
+Boosted stat-changing moves:
+- Acid Armor boosts the user's Defense by 3 stages.
+
+Other Moves:
+- Aqua Ring causes the user to lose 1/16 max HP each turn instead of restoring it, unless the user is Poison or Steel-type
+- Barb Barrage and Venoshock double in power regardless of status
+- Energy Ball gets a Poison sub-typing
+- Toxic's accuracy is increased to 100%
+- Floral Healing and Life Dew additionally poison their target.
+- Camouflage changes the user's type to Poison
+- Nature Power becomes Venoshock
+- Secret Power can inflict Poison
+- Terrain Pulse's type becomes Poison
+
+Transitions to Other Fields:

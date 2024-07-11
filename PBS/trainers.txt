@@ -29,6 +29,7 @@ Pokemon = GROWLITHE, 5
 [RIVAL_Riley,Riley]
 LoseText = Hmph. Not bad I guess.
 Pokemon = NIDORANfE, 5
+    Moves = SCRATCH
 	Nature = ADAMANT
 	AbilityIndex = 0
     IV = 31
