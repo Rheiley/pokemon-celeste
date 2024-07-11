@@ -108,7 +108,7 @@ class Battle::Battler
       end
     end
 #============================================================================= 08 Corrosive Mist Field
-    if [:CorrosiveField].include?(@battle.field.terrain)
+    if [:CorrosiveMistField].include?(@battle.field.terrain)
       if [:GRAVITY].include?(move.id)
         @battle.pbDisplay(_INTL("The toxic mist collected on the ground!"))
         @battle.pbStartTerrain(user, :CorrosiveField, false)
@@ -120,6 +120,37 @@ class Battle::Battler
       if [:DEFOG, :GUST, :HURRICANE, :RAZORWIND, :SUPERSONICSKYSTRIKE, :TAILWIND, :TWISTER, :WHIRLWIND].include?(move.id)
         @battle.pbDisplay(_INTL("The mist was blown away!"))
         @battle.pbStartTerrain(user, :None, false)
+      end
+      if [:FLAMEBURST, :ERUPTION, :EXPLOSION, :FIREPLEDGE, :HEATWAVE, :INCINERATE, :INFERNOOVERDRIVE, :LAVAPLUME, :MINDBLOWN, :SEARINGSHOT, :SELFDESTRUCT].include?(move.id)
+        damp = false
+        @battle.allBattlers.each do |battler|
+          if battler.hasActiveAbility?(:DAMP)
+            damp = true
+            @battle.pbShowAbilitySplash(battler)
+            @battle.pbDisplay(_INTL("The dampness prevented the combustion!"))
+            @battle.pbHideAbilitySplash(battler)
+          end
+        end
+        if !damp
+          @battle.pbStartTerrain(user, :None, false)
+          @battle.pbDisplay(_INTL("The toxic mist combusted!"))
+          @battle.allBattlers.each do |battler|
+            next if battler.effects[PBEffects::Protect]|| battler.effects[PBEffects::BanefulBunker] || battler.effects[PBEffects::WideGuard] || 
+                    battler.hasActiveAbility?(:FLASHFIRE) || !battler.affectedByTerrain?
+            if battler.hasActiveAbility?(:STURDY) || battler.effects[PBEffects::Endure]
+              amt = battler.totalhp - 1 if battler.hasActiveAbility?(:STURDY)
+              amt = battler.hp - 1 if battler.effects[PBEffects::Endure]
+              battler.pbReduceHP(amt, false) 
+              @battle.pbShowAbilitySplash(battler)
+              @battle.pbDisplay(_INTL("{1} hung on with Sturdy!", battler.pbThis)) if battler.hasActiveAbility?(:STURDY)
+              @battle.pbDisplay(_INTL("{1} endured the combustion!", battler.pbThis)) if battler.effects[PBEffects::Endure]
+              @battle.pbHideAbilitySplash(battler)
+            else
+              battler.pbReduceHP(battler.totalhp, false)
+            end
+            battler.pbFaint if battler.fainted?
+          end
+        end
       end
     end
 #=============================================================================

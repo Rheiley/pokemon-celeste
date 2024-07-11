@@ -52,8 +52,8 @@ Transitions from Other Fields:
 	- The Z-Move Stoked Sparksurfer for 3 turns
 	
 General Effects:
-- Grounded Pokemon cannot fall asleep
-- Electric type moves used by grounded Pokemon increaase in base power by 1.3x
+- Grounded Pokémon cannot fall asleep
+- Electric type moves used by grounded Pokémon increaase in base power by 1.3x
 
 Abilities Affected:
 - Galvanize's base power boost is increased to 1.5x (from 1.2x)
@@ -100,9 +100,9 @@ Transitions from Other Fields:
 - Corrosive Field will transform into this Field if the move Seed Flare is used
 
 General Effects:
-- Grounded Pokemon restore 1/16 max hp at the end of the turn
-- Grass-type moves used by grounded Pokemon increase in base power by 1.3x
-- Fire-type moves used against grounded Pokemon increase in base power by 1.3x
+- Grounded Pokémon restore 1/16 max hp at the end of the turn
+- Grass-type moves used by grounded Pokémon increase in base power by 1.3x
+- Fire-type moves used against grounded Pokémon increase in base power by 1.3x
 
 Abilities Affected:
 - Grass Pelt is activated
@@ -164,7 +164,7 @@ Transitions from Other Fields:
 General Effects:
 - Fairy-type moves increase in base power by 1.3x
 - Dragon-type moves decrease in base power by 0.5x
-- Grounded Pokemon are immune to status conditions, yawn and confusion
+- Grounded Pokémon are immune to status conditions, yawn and confusion
 
 Abilities Affected:
 - Pixilate's base power boost is increased to 1.5x (from 1.2x)
@@ -302,8 +302,8 @@ Abilities Affected:
 - Mimicry changes the user's type to Rock
 - Long Reach drops accuracy by x0.9
 - Defeatist always deactivates
-- Shell Armor Pokemon attacked by a contact move will make the attacker lose 1/8 max hp
-- Battle Armor Pokemon attacked by a contact move will make the attacker lose 1/8 max hp
+- Shell Armor Pokémon attacked by a contact move will make the attacker lose 1/8 max hp
+- Battle Armor Pokémon attacked by a contact move will make the attacker lose 1/8 max hp
 
 Moves that increase in base power by 2x:
 - Rock Smash
@@ -438,3 +438,18 @@ Other Moves:
 - Terrain Pulse's type becomes Poison
 
 Transitions to Other Fields:
+- The following moves will cause the toxic mist to combust and terminate this field, KO-ing all active Pokémon on the field:
+       - Eruption
+       - Explosion
+       - Fire Pledge
+       - Heat Wave
+       - Incinerate
+       - Inferno Overdrive
+       - Lava Plume
+       - Mind Blown
+       - Searing Shot
+       - Self-Destruct
+
+       * Damp will prevent the field from combusting
+       * Pokémon with the ability Sturdy at full HP or that are using Endure will survive with 1 HP
+       * Pokémon with the ability Flash Fire, in the semi-invulnerable turn of a move, or under the effects of Protect, Wide Guard, or Baneful Bunker take no field damage.
