@@ -1,6 +1,6 @@
 ﻿# See the documentation on the wiki to learn how to edit this file.
 #-------------------------------
-[POKEMONTRAINER_Red]
+[PROTAGONIST_Male]
 Name = Pokémon Trainer
 Gender = Male
 BaseMoney = 60
