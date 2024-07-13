@@ -5,7 +5,7 @@ Name = Pokémon Trainer
 Gender = Male
 BaseMoney = 60
 #-------------------------------
-[POKEMONTRAINER_Leaf]
+[PROTAGONIST_Female]
 Name = Pokémon Trainer
 Gender = Female
 BaseMoney = 60

@@ -23,7 +23,7 @@ FishCharset = boy_fish_offset
 SurfFishCharset = boy_fish_offset
 #-------------------------------
 [2]
-TrainerType = POKEMONTRAINER_Leaf
+TrainerType = PROTAGONIST_Female
 WalkCharset = trainer_POKEMONTRAINER_Leaf
 RunCharset = girl_run
 CycleCharset = girl_bike
