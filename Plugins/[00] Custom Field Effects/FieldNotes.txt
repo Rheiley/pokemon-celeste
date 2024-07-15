@@ -7,7 +7,7 @@ Psychic Terrain             = 04 Done
 Inverse Field               = 05 Done
 Rocky Field                 = 06 Done
 Corrosive Field             = 07 Done
-Corrosive Mist Field        = 08
+Corrosive Mist Field        = 08 Done
 
 ------------------------------------------------------------------
 00 			FieldNotes Format
@@ -438,6 +438,17 @@ Other Moves:
 - Terrain Pulse's type becomes Poison
 
 Transitions to Other Fields:
+- This field will transform into Corrosive Field if the move Gravity is used
+- This field will transform into Misty Terrain if the move Seed Flare is used
+- The following moves will terminate this field:
+       - Defog
+       - Gust
+       - Hurricane
+       - Razor Wind
+       - Supersonic Skystrike
+       - Tailwind
+       - Twister
+       - Whirlwind
 - The following moves will cause the toxic mist to combust and terminate this field, KO-ing all active Pokémon on the field:
        - Eruption
        - Explosion
