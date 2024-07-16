@@ -10,6 +10,7 @@ GameData::BattleTerrain.register({:id => :InverseField,       :name => _INTL("In
 GameData::BattleTerrain.register({:id => :RockyField,         :name => _INTL("RockyField")})         # 06 Rocky Field
 GameData::BattleTerrain.register({:id => :CorrosiveField,     :name => _INTL("CorrosiveField")})     # 07 Corrosive Field
 GameData::BattleTerrain.register({:id => :CorrosiveMistField, :name => _INTL("CorrosiveMistField")}) # 08 Corrosive Mist Field
+GameData::BattleTerrain.register({:id => :BurningField,       :name => _INTL("BurningField")})       # 09 Burning Field
 
 #===============================================================================
 # Field Note
@@ -25,6 +26,7 @@ class Battle
       when :RockyField	  		      then pbDisplay(_INTL("The field is littered with rocks!"))                      # 06
       when :CorrosiveField  		    then pbDisplay(_INTL("The field is corrupted!"))                                # 07
       when :CorrosiveMistField	    then pbDisplay(_INTL("Corrosive mist settles on the field!"))                   # 08
+      when :BurningField            then pbDisplay(_INTL("The field is ablaze!"))                                   # 09
     end
   end
 
@@ -38,6 +40,7 @@ class Battle
       when :RockyField           then pbDisplay(_INTL("The rocks disappeared from the battlefield!"))            # 06
       when :CorrosiveField       then pbDisplay(_INTL("The corruption disappeared from the battlefield!"))       # 07
       when :CorrosiveMistField   then pbDisplay(_INTL("The corrosive mist disappeared from the battlefield!"))   # 08
+      when :BurningField         then pbDisplay(_INTL("The flames disappeared from the battlefield!"))           # 09
     end
   end
 end
@@ -64,6 +67,7 @@ module BattleCreationHelperMethods
     battle.defaultTerrain = :RockyField        		 if $game_switches[126]   # 06
     battle.defaultTerrain = :CorrosiveField    		 if $game_switches[127]   # 07
 	  battle.defaultTerrain = :CorrosiveMistField    if $game_switches[128]   # 08
+    battle.defaultTerrain = :BurningField          if $game_switches[129]   # 09
 #===============================================================================Need Announcement
     battle.field.effects[PBEffects::FairyLock] = 100         if $game_switches[111]
     battle.field.effects[PBEffects::Gravity] = 100           if $game_switches[112]

@@ -2,12 +2,14 @@
 None                        = 00 Done
 Electric Terrain            = 01 Done
 Grassy Terrain              = 02 Done (except for transition to BurningField)
-Misty Terrain               = 03 Done (except for transition to CorrosiveMistField)
+Misty Terrain               = 03 Done
 Psychic Terrain             = 04 Done
 Inverse Field               = 05 Done
 Rocky Field                 = 06 Done
 Corrosive Field             = 07 Done
 Corrosive Mist Field        = 08 Done
+
+*All fields will turn into Rocky Field for 5 turns if the Z-Move Splintered Stormshards is used.
 
 ------------------------------------------------------------------
 00 			FieldNotes Format
@@ -40,7 +42,6 @@ Other Moves:
 
 
 Transitions to Other Fields:
-
 
 ------------------------------------------------------------------
 01 			   Electric Terrain 
@@ -87,7 +88,7 @@ Other Moves:
 - Secret Power may paralyze
 
 Transitions to Other Fields:
-- The moves Tectonic Rage, and Splintered Stormshards will terminate this field
+- The move Tectonic Rage will terminate this field
 ------------------------------------------------------------------
 02 			   Grassy Terrain
 ------------------------------------------------------------------
@@ -139,7 +140,6 @@ Other moves:
 - Terrain Pulse becomes Grass-type
 
 Transitions to Other Fields:
-- The move Splintered Stormshards will terminate this Field
 - This Field will transform into Corrosive Field if either of the moves Sludge Wave or Acid Downpour is used
 - This Field will transform into Burning Field if any of the following moves is used in the absence of rain and Water Sport:
        - Eruption
@@ -213,7 +213,7 @@ Other Moves:
 Transitions to Other Fields:
 - This field will transform into Corrosive Mist Field if either of the moves Acid Downpour, Poison Gas, Smog or Clear Smog is used.
 - The following moves will terminate this Field:
-       - Defog, Gust, Hurricane, Razor Wind, Supersonic Skystrike, Splintered Stormshards, Tailwind, Twister, Whirlwind
+       - Defog, Gust, Hurricane, Razor Wind, Supersonic Skystrike, Tailwind, Twister, Whirlwind
 ------------------------------------------------------------------
 04			   Psychic Terrain
 ------------------------------------------------------------------
@@ -264,9 +264,6 @@ Other Moves:
 - Nature Power becomes Psychic
 - Secret Power may confuse
 - Terrain Pulse becomes Psychic-type
-
-Transitions to Other Fields:
-- The move Splintered Stormshards will terminate this Field
 ------------------------------------------------------------------
 05			   Inverse Field
 ------------------------------------------------------------------
@@ -288,7 +285,7 @@ Moves Affected:
 - Terrain Pulse's type becomes Normal
 
 Transitions to Other Fields:
-- The moves Splintered Stormshards and Topsy-Turvy will terminate this Field.
+- The move Topsy-Turvy will terminate this Field.
 ------------------------------------------------------------------
 06			   Rocky Field
 ------------------------------------------------------------------
@@ -334,10 +331,6 @@ Other moves:
 - Camouflage changes the user's type to Rock
 - Nature Power becomes Rock Smash
 - Terrain Pulse becomes Rock-type
-
-Transitions to Other Fields:
-- Splintered Stormshards will terminate this field
-
 ------------------------------------------------------------------
 07 			Corrosive Field
 ------------------------------------------------------------------
@@ -464,3 +457,49 @@ Transitions to Other Fields:
        * Damp will prevent the field from combusting
        * Pokémon with the ability Sturdy at full HP or that are using Endure will survive with 1 HP
        * Pokémon with the ability Flash Fire, in the semi-invulnerable turn of a move, or under the effects of Protect, Wide Guard, or Baneful Bunker take no field damage.
+------------------------------------------------------------------
+09 			Burning Field
+------------------------------------------------------------------
+"The field is ablaze!"
+
+
+Transitions from Other Fields:
+- Grassy Terrain will transform into this Field if any of the following moves are used in the absence of rain and Water Sport:
+       - Eruption
+       - Fire Pledge
+       - Flame Burst
+       - Heat Wave
+       - Incinerate
+       - Lava Plume
+       - Mind Blown
+       - Searing Shot
+       - Inferno Overdrive
+
+
+General Effects:
+- Fire-type moves used by grounded Pokémon increase in base power by 1.5x
+- Grass-type moves used against grounded Pokémon decrease in base power by 0.5x
+- Ice-type moves decrease in base power by 0.5x
+- No Pokémon can be frozen.
+- Hail is terminated.
+
+
+Abilities Affected:
+
+
+Moves that increase in base power by 1.5x:
+
+
+Moves that increase in base power by 2x:
+
+
+Moves that decrease in base power by 0.5x:
+
+
+Boosted stat-changing moves:
+
+
+Other Moves:
+
+
+Transitions to Other Fields:

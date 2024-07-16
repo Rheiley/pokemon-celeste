@@ -113,6 +113,16 @@ class Battle::Move
 				if [:BARBBARRAGE].include?(@id)
 					baseDmg = 120
 				end
+#============================================================================= 09 Burning Field
+			when :BurningField
+				if type == :FIRE && user.affectedByTerrain?
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The blaze amplified the attack!"))
+				end
+				if (type == :GRASS && target.affectedByTerrain?) || type == :ICE
+					baseDmg *= 0.5
+					@battle.pbDisplay(_INTL("The blaze softened the attack..."))
+				end
 #=============================================================================
 			end
     return baseDmg

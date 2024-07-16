@@ -2,6 +2,12 @@
 # Move Effect
 #===============================================================================
 class Battle::Battler
+
+  def pbCanFreeze?(user, showMessages, move = nil)
+    return false if user.battle.field.terrain == :BurningField
+    return pbCanInflictStatus?(:FROZEN, user, showMessages, move)
+  end
+
   alias fieldEffects_pbEffectsAfterMove pbEffectsAfterMove
   def pbEffectsAfterMove(user, targets, move, numHits)
 #============================================================================= 01 Electric Terrain
@@ -11,10 +17,10 @@ class Battle::Battler
       end
     end
     if [:ElectricTerrain].include?(@battle.field.terrain) 
-      if [:TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
-        @battle.pbDisplay(_INTL("The hyper-charged terrain shorted out!"))
-        @battle.pbStartTerrain(user, :None, false)
-      end
+      # if [:TECTONICRAGE, :SPLINTEREDSTORMSHARDS].include?(move.id)
+      #   @battle.pbDisplay(_INTL("The hyper-charged terrain shorted out!"))
+      #   @battle.pbStartTerrain(user, :None, false)
+      # end
     end
 #============================================================================= 02 Grassy Terrain
     if ![:GrassyTerrain].include?(@battle.field.terrain)
@@ -30,7 +36,7 @@ class Battle::Battler
       if [:ERUPTION, :FIREPLEDGE, :FLAMEBURST, :HEATWAVE, :INCINERATE, :LAVAPLUME, :MINDBLOWN, :SEARINGSHOT, :INFERNOOVERDRIVE].include?(move.id) && 
          ![:Rain, :HeavyRain].include?(user.effectiveWeather) && @battle.field.effects[PBEffects::WaterSportField] == 0
         @battle.pbDisplay(_INTL("The grass was burned away!"))
-        @battle.pbStartTerrain(user, :None, false) # Will change to BurningField once it is implemented
+        @battle.pbStartTerrain(user, :BurningField, false)
       end
     end
 #============================================================================= 03 Misty Terrain
@@ -56,7 +62,6 @@ class Battle::Battler
         end
         if [:WHIRLWIND, :GUST, :RAZORWIND, :HURRICANE, :DEFOG, :TAILWIND, :TWISTER, :SUPERSONICSKYSTRIKE].include?(move.id)
           @battle.pbDisplay(_INTL("The mist was blown away!"))
-          #@battle.field.terrain = :None
           @battle.pbStartTerrain(user, :None, false)
         end
         if [:CLEARSMOG, :SMOG, :POISONGAS, :ACIDDOWNPOUR].include?(move.id)
@@ -95,10 +100,7 @@ class Battle::Battler
     end
 #============================================================================= 06 Rocky Field
     if [:RockyField].include?(@battle.field.terrain)
-      if [:SPLINTEREDSTORMSHARDS].include?(move.id)
-        @battle.pbDisplay(_INTL("The field was terminated!"))
-        @battle.pbStartTerrain(user, :None, false)
-      end
+
     end
 #============================================================================= 07 Corrosive Field
     if [:CorrosiveField].include?(@battle.field.terrain)
@@ -152,6 +154,10 @@ class Battle::Battler
           end
         end
       end
+    end
+#============================================================================= 09 Burning Field
+    if [:BurningField].include?(@battle.field.terrain)
+      
     end
 #=============================================================================
 =begin
