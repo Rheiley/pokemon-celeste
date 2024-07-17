@@ -38,6 +38,35 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:GALVANIZE,
   }
 )
 
+# Blaze
+Battle::AbilityEffects::DamageCalcFromUser.add(:BLAZE,
+  proc { |ability, user, target, move, mults, power, type|
+    if (user.hp <= user.totalhp / 3 || [:BurningField].include?(user.battle.field.terrain)) && type == :FIRE
+      mults[:attack_multiplier] *= 1.5
+    end
+  }
+)
+
+# Flash Fire
+Battle::AbilityEffects::EndOfRoundEffect.add(:FLASHFIRE,
+  proc { |ability, battler, battle|
+    if battle.field.terrain == :BurningField && battler.affectedByTerrain? && !battler.effects[PBEffects::FlashFire]
+      battle.pbShowAbilitySplash(battler)
+      battle.pbDisplay(_INTL("{1}'s Flash Fire activated!", battler.pbThis))
+      battler.effects[PBEffects::FlashFire] = true
+      battle.pbHideAbilitySplash(battler)
+    end
+  }
+)
+
+
+# Flare Boost
+Battle::AbilityEffects::DamageCalcFromUser.add(:FLAREBOOST,
+  proc { |ability, user, target, move, mults, power, type|
+    mults[:power_multiplier] *= 1.5 if (user.burned? || [:BurningField].include?(user.battle.field.terrain)) && move.specialMove?
+  }
+)
+
 # Comatose
 Battle::AbilityEffects::OnSwitchIn.add(:COMATOSE,
   proc { |ability, battler, battle, switch_in|
@@ -480,7 +509,8 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
         :PsychicTerrain  => :PSYCHIC,
 		    :RockyField      => :ROCK,
 		    :CorrosiveField	 => :POISON,
-        :CorrosiveMistField	 => :POISON
+        :CorrosiveMistField	 => :POISON,
+        :BurningField    => :FIRE
       }
       new_type = terrain_hash[battle.field.terrain]
       new_type_name = nil

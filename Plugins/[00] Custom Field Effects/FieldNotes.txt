@@ -485,6 +485,9 @@ General Effects:
 
 
 Abilities Affected:
+- Blaze and Flare Boost are activated
+- Flash Fire is activated at the end of the turn if the user is grounded
+- Mimicry changes the user's type to Fire
 
 
 Moves that increase in base power by 1.5x:
