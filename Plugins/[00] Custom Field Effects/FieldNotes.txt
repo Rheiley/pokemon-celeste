@@ -1,13 +1,14 @@
 [ FIELD ]
 None                        = 00 Done
 Electric Terrain            = 01 Done
-Grassy Terrain              = 02 Done (except for transition to BurningField)
+Grassy Terrain              = 02 Done
 Misty Terrain               = 03 Done
 Psychic Terrain             = 04 Done
 Inverse Field               = 05 Done
 Rocky Field                 = 06 Done
 Corrosive Field             = 07 Done
 Corrosive Mist Field        = 08 Done
+Burning Field               = 09 Done
 
 *All fields will turn into Rocky Field for 5 turns if the Z-Move Splintered Stormshards is used.
 
@@ -389,7 +390,6 @@ Transitions to Other Fields:
 ------------------------------------------------------------------
 "Corrosive mist settles on the field!"
 
-
 Transitions from Other Fields:
 - Misty Terrain will transform into this field upon one use of the move Acid Downpour, or two uses of any of the moves Smog, Clear Smog, or Poison Gas
 
@@ -397,7 +397,6 @@ General Effects:
 - Fire-type moves increase in base power by 1.5x.
 - Special Flying-type moves gain a Poison sub-type.
 - All non-Poison or Steel-type Pokémon on the field are poisoned at the end of each turn unless Neutralizing Gas is active
-
 
 Abilities Affected:
 - Corrosion additionally boosts damage by 1.5x
@@ -462,7 +461,6 @@ Transitions to Other Fields:
 ------------------------------------------------------------------
 "The field is ablaze!"
 
-
 Transitions from Other Fields:
 - Grassy Terrain will transform into this Field if any of the following moves are used in the absence of rain and Water Sport:
        - Eruption
@@ -475,7 +473,6 @@ Transitions from Other Fields:
        - Searing Shot
        - Inferno Overdrive
 
-
 General Effects:
 - Fire-type moves used by grounded Pokémon increase in base power by 1.5x
 - Grass-type moves used against grounded Pokémon decrease in base power by 0.5x
@@ -483,26 +480,34 @@ General Effects:
 - No Pokémon can be frozen.
 - Hail is terminated.
 
-
 Abilities Affected:
 - Blaze and Flare Boost are activated
 - Flash Fire is activated at the end of the turn if the user is grounded
 - Mimicry changes the user's type to Fire
 
+Moves that increase in base power by 1.5x and gain Fire as a secondary type:
+- Clear Smog
+- Smog
+- Infernal Parade
 
-Moves that increase in base power by 1.5x:
-
-
-Moves that increase in base power by 2x:
-
-
-Moves that decrease in base power by 0.5x:
-
-
-Boosted stat-changing moves:
-
+Moves that increase in base power by 2x and gain Fire as a secondary type:
+- Smack Down
+- Thousand Arrows
 
 Other Moves:
-
+- Will-o-Wisp's accuracy is increased to 100%
+- Nature Power becomes Flamethrower
+- Secret Power may Burn
+- Terrain Pulse becomes Fire-type
 
 Transitions to Other Fields:
+- This Field will be terminated if rain is active at the end of the turn or if any of the following moves are used:
+       - Muddy Water
+       - Sparkling Aria
+       - Surf
+       - Water Pledge
+       - Water Sport
+       - Water Spout
+       - Continental Crush
+       - Hydro Vortex
+       - Oceanic Operetta

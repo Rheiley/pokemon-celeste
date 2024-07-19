@@ -157,7 +157,9 @@ class Battle::Battler
     end
 #============================================================================= 09 Burning Field
     if [:BurningField].include?(@battle.field.terrain)
-      
+      if [:MUDDYWATER, :SPARKLINGARIA, :SURF, :WATERPLEDGE, :WATERSPORT, :WATERSPOUT, :CONTINENTALCRUSH, :HYDROVORTEX, :OCEANICOPERETTA].include?(move.id)
+        @battle.pbStartTerrain(user, :None, false)
+      end
     end
 #=============================================================================
 =begin
@@ -783,29 +785,31 @@ end
 class Battle::Move::TypeAndPowerDependOnTerrain < Battle::Move
   def pbBaseDamage(baseDmg, user, target)
     baseDmg *= 2 if [:ElectricTerrain, :GrassyTerrain, :MistyTerrain, :PsychicTerrain, 
-                    :InverseField, :RockyField, :CorrosiveField, :CorrosiveMistField].include?(@battle.field.terrain) && user.affectedByTerrain?
+                    :InverseField, :RockyField, :CorrosiveField, :CorrosiveMistField, :BurningField].include?(@battle.field.terrain) && user.affectedByTerrain?
     return baseDmg
   end
 
   def pbBaseType(user)
     ret = :NORMAL
     case @battle.field.terrain
-    when :ElectricTerrain
-      ret = :ELECTRIC      if GameData::Type.exists?(:ELECTRIC)
-    when :GrassyTerrain
-      ret = :GRASS         if GameData::Type.exists?(:GRASS)
-    when :MistyTerrain
-      ret = :FAIRY         if GameData::Type.exists?(:FAIRY)
-    when :PsychicTerrain
-      ret = :PSYCHIC       if GameData::Type.exists?(:PSYCHIC)
-    when :InverseField
-      ret = :NORMAL      if GameData::Type.exists?(:NORMAL)
-    when :RockyField
-      ret = :ROCK          if GameData::Type.exists?(:ROCK)
-    when :CorrosiveField 
-      ret = :POISON        if GameData::Type.exists?(:POISON)
-    when :CorrosiveMistField
-      ret = :POISON        if GameData::Type.exists?(:POISON)
+      when :ElectricTerrain
+        ret = :ELECTRIC      if GameData::Type.exists?(:ELECTRIC)
+      when :GrassyTerrain
+        ret = :GRASS         if GameData::Type.exists?(:GRASS)
+      when :MistyTerrain
+        ret = :FAIRY         if GameData::Type.exists?(:FAIRY)
+      when :PsychicTerrain
+        ret = :PSYCHIC       if GameData::Type.exists?(:PSYCHIC)
+      when :InverseField
+        ret = :NORMAL        if GameData::Type.exists?(:NORMAL)
+      when :RockyField
+        ret = :ROCK          if GameData::Type.exists?(:ROCK)
+      when :CorrosiveField 
+        ret = :POISON        if GameData::Type.exists?(:POISON)
+      when :CorrosiveMistField
+        ret = :POISON        if GameData::Type.exists?(:POISON)
+      when :BurningField
+        ret = :FIRE          if GameData::Type.exists?(:FIRE)
     end
     return ret
   end
@@ -848,6 +852,8 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
         @npMove = :ACIDSPRAY	   if GameData::Move.exists?(:ACIDSPRAY)
       when :CorrosiveMistField
         @npMove = :VENOSHOCK	   if GameData::Move.exists?(:VENOSHOCK)
+      when :BurningField
+        @npMove = :FLAMETHROWER  if GameData::Move.exists?(:FLAMETHROWER)
     else
       try_move = nil
       case @battle.environment
@@ -912,6 +918,8 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
       @secretPower = 15  # Acid Spray, poison
     when :CorrosiveMistField
       @secretPower = 15  # Acid Spray, poison
+    when :BurningField
+      @secretPower = 10  # Incinerate, burn
     else
       case @battle.environment
       when :Grass, :TallGrass, :Forest, :ForestGrass

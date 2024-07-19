@@ -80,6 +80,12 @@ class Battle::Move
 			ret *= Effectiveness.calculate(:POISON, defType)
 		end
 	end
+#============================================================================= 09 Burning Field
+	if [:CorrosiveMistField].include?(@battle.field.terrain)
+		if [:CLEARSMOG, :SMOG, :SMACKDOWN, :THOUSANDARROWS].include?(@id) && GameData::Type.exists?(:FIRE)
+			ret *= Effectiveness.calculate(:FIRE, defType)
+		end
+	end
 #=============================================================================
     return ret
   end

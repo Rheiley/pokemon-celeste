@@ -23,16 +23,16 @@ Pokemon = GROWLITHE, 5
 	Nature = NAIVE
 	AbilityIndex = 0
 	Gender = male
-    IV = 31
-	EV = 4,252,0,0,0,252
+    IV = 10
+	EV = 25,25,25,25,25,25
 #-------------------------------
 [RIVAL_Riley,Riley]
 LoseText = Hmph. Not bad I guess.
 Pokemon = NIDORANfE, 5
 	Nature = ADAMANT
 	AbilityIndex = 0
-    IV = 31
-	EV = 4,252,0,0,0,252
+    IV = 10
+	EV = 25,25,25,25,25,25
 #-------------------------------
 
 #-------------------------------

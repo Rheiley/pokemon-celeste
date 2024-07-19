@@ -31,7 +31,7 @@ class Battle::Move
 				end
 				if [:FAIRYWIND, :SILVERWIND, :GUST, :ICYWIND, :OMINOUSWIND, :RAZORWIND, :TWISTER].include?(@id)
 					baseDmg *= 1.5
-					@battle.pbDisplay(_INTL("The wind picked up strength from the field!", target.pbThis))
+					@battle.pbDisplay(_INTL("The wind picked up strength from the field!"))
 				end
 #============================================================================= 03 Misty Terrain
 			when :MistyTerrain
@@ -122,6 +122,14 @@ class Battle::Move
 				if (type == :GRASS && target.affectedByTerrain?) || type == :ICE
 					baseDmg *= 0.5
 					@battle.pbDisplay(_INTL("The blaze softened the attack..."))
+				end
+				if [:SMOG, :CLEARSMOG, :INFERNALPARADE].include?(@id)
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The flames spread from the attack!"))
+				end
+				if [:SMACKDOWN, :THOUSANDARROWS].include?(@id)
+					baseDmg *= 2
+					@battle.pbDisplay(_INTL("{1} was knocked into the flames!", @target.pbThis))
 				end
 #=============================================================================
 			end

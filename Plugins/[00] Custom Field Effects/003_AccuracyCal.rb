@@ -60,6 +60,12 @@ class Battle::Move
 			modifiers[:base_accuracy] = 100
 		end
 	end
+  #============================================================================= 09 Burning Field
+	if [:BurningField].include?(@battle.field.terrain)
+		if [:WILLOWISP].include?(@id)
+			modifiers[:base_accuracy] = 100
+		end
+	end
 #=============================================================================
     # Calculation
     max_stage = Battle::Battler::STAT_STAGE_MAXIMUM
