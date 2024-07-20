@@ -84,8 +84,10 @@ class Battle
         pbDisplay(_INTL("{1} is hurt by the shadow sky!", battler.pbThis))
         amt = battler.totalhp / 16
       when :Rain
-        battler.battle.pbStartTerrain(battler, :None, false)
-        pbDisplay(_INTL("The rain snuffed out the flames!"))
+        if battler.battle.field.terrain == :BurningField
+          battler.battle.pbStartTerrain(battler, :None, false) 
+          pbDisplay(_INTL("The rain snuffed out the flames!"))
+        end
     end
     return if amt < 0
     @scene.pbDamageAnimation(battler)
