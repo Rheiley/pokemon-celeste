@@ -19,13 +19,6 @@ MapPosition = 0,13,12
 Name = Pokémon Lab
 MapPosition = 0,13,12
 #-------------------------------
-[005]   # Route 1
-Name = Route 1
-Outdoor = true
-ShowArea = true
-MapPosition = 0,13,11
-BattleBack = field
-#-------------------------------
 [006]   # Kurt's house
 Name = Route 1
 MapPosition = 0,13,11
