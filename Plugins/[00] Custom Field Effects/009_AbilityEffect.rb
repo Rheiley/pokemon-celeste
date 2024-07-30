@@ -403,6 +403,33 @@ Battle::AbilityEffects::OnSwitchIn.add(:SANDSTREAM,
   }
 )
 
+# Sand Force
+Battle::AbilityEffects::DamageCalcFromUser.add(:SANDFORCE,
+  proc { |ability, user, target, move, mults, power, type|
+    if (user.effectiveWeather == :Sandstorm || user.battle.field.terrain == :DesertField) &&
+       [:ROCK, :GROUND, :STEEL].include?(type)
+      mults[:power_multiplier] *= 1.3
+    end
+  }
+)
+
+# Sand Rush
+Battle::AbilityEffects::SpeedCalc.add(:SANDRUSH,
+  proc { |ability, battler, mult|
+    if [:Sandstorm].include?(battler.effectiveWeather) || battler.battle.field.terrain == :DesertField
+      next mult * 2
+    end
+  }
+)
+
+# Sand Veil
+Battle::AbilityEffects::AccuracyCalcFromTarget.add(:SANDVEIL,
+  proc { |ability, mods, user, target, move, type|
+    if target.effectiveWeather == :Sandstorm || target.battle.field.terrain == :DesertField
+      mods[:evasion_multiplier] *= 1.25
+    end
+  }
+)
 
 # Battle Armor
 Battle::AbilityEffects::CriticalCalcFromTarget.add(:BATTLEARMOR,

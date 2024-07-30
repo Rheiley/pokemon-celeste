@@ -131,6 +131,12 @@ class Battle::Move
 					baseDmg *= 2
 					@battle.pbDisplay(_INTL("{1} was knocked into the flames!", @target.pbThis))
 				end
+#============================================================================= 10 Desert Field
+			when :DesertField
+				if (type == :WATER && user.affectedByTerrain? && ![:SCALD, :STEAMERUPTION].include?(@id)) || (type == :ELECTRIC && target.affectedByTerrain?)
+					baseDmg *= 0.5
+					@battle.pbDisplay(_INTL("The desert softened the attack..."))
+				end
 #=============================================================================
 			end
     return baseDmg
