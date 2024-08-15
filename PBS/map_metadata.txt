@@ -397,6 +397,7 @@ Outdoor = true
 BattleBack = sand
 ShowArea = true
 SnapEdges = true
+Weather = Sandstorm, 100
 #-------------------------------
 [042]   # Route 1
 Name = Route 1
