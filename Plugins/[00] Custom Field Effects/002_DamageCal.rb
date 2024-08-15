@@ -137,6 +137,14 @@ class Battle::Move
 					baseDmg *= 0.5
 					@battle.pbDisplay(_INTL("The desert softened the attack..."))
 				end
+				if [:BURNUP, :DIG, :NEEDLEARM, :HEATWAVE, :PINMISSILE, :SANDTOMB, :SANDSEARSTORM, :SCALD, :SCORCHINGSANDS, :SEARINGSUNRAZESMASH, :STEAMERUPTION, :THOUSANDWAVES].include?(@id)
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The desert strengthened the attack!"))
+				end
+				if [:BONEMERANG, :BONECLUB, :BONERUSH, :SHADOWBONE].include?(@id)
+					baseDmg *= 1.5
+					@battle.pbDisplay(_INTL("The lifeless desert strengthened the attack!"))
+				end
 #=============================================================================
 			end
     return baseDmg

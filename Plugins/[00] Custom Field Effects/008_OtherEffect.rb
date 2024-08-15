@@ -129,7 +129,10 @@ class Battle
     if [:GrassyTerrain].include?(@field.terrain) && battler.affectedByTerrain? &&
        battler.effects[PBEffects::TrappingMove] == :SNAPTRAP
        hpLoss = battler.totalhp / 6
-	end
+	  end
+    if [:DesertField].include?(@field.terrain) && battler.affectedByTerrain? && battler.effects[PBEffects::TrappingMove] == :SANDTOMB
+      hpLoss = battler.totalhp / 6
+    end
 #=============================================================================
     @scene.pbDamageAnimation(battler)
     battler.pbTakeEffectDamage(hpLoss, false) do |hp_lost|

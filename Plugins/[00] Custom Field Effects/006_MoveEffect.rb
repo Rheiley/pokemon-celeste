@@ -810,6 +810,8 @@ class Battle::Move::TypeAndPowerDependOnTerrain < Battle::Move
         ret = :POISON        if GameData::Type.exists?(:POISON)
       when :BurningField
         ret = :FIRE          if GameData::Type.exists?(:FIRE)
+      when :DesertField
+        ret = :GROUND        if GameData::Type.exists?(:GROUND)
     end
     return ret
   end
@@ -854,6 +856,8 @@ class Battle::Move::UseMoveDependingOnEnvironment < Battle::Move
         @npMove = :VENOSHOCK	   if GameData::Move.exists?(:VENOSHOCK)
       when :BurningField
         @npMove = :FLAMETHROWER  if GameData::Move.exists?(:FLAMETHROWER)
+      when :DesertField
+        @npMove = :SANDTOMB      if GameData::Move.exists?(:SANDTOMB)
     else
       try_move = nil
       case @battle.environment
@@ -920,6 +924,8 @@ class Battle::Move::EffectDependsOnEnvironment < Battle::Move
       @secretPower = 15  # Acid Spray, poison
     when :BurningField
       @secretPower = 10  # Incinerate, burn
+    when :DesertField
+      @secretPower = 8 # Mud Slap, lower Accuracy by 1
     else
       case @battle.environment
       when :Grass, :TallGrass, :Forest, :ForestGrass
@@ -1030,7 +1036,9 @@ class Battle::Move::SetUserTypesBasedOnEnvironment < Battle::Move
     :InverseField    => :NORMAL,
     :RockyField      => :ROCK,
     :CorrosiveField  => :POISON,
-    :CorrosiveMistField  => :POISON
+    :CorrosiveMistField  => :POISON,
+    :BurningField    => :FIRE,
+    :DesertField     => :GROUND
   }
   ENVIRONMENT_TYPES = {
     :None        => :NORMAL,

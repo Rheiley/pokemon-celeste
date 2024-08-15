@@ -253,6 +253,17 @@ Battle::AbilityEffects::DamageCalcFromTarget.add(:GRASSPELT,
   }
 )
 
+Battle::AbilityEffects::EndOfRoundEffect.add(:GRASSPELT,
+  proc { |ability, battler, battle|
+    if battler.battle.field.terrain == :CorrosiveField
+        battle.pbShowAbilitySplash(battler)
+		    battler.pbReduceHP(battler.totalhp / 8, false)
+        battle.pbDisplay(_INTL("{1} is hurt by the corrosion!", battler.pbThis))
+        battle.pbHideAbilitySplash(battler)
+    end
+  }
+)
+
 # Power Spot
 Battle::AbilityEffects::DamageCalcFromAlly.add(:POWERSPOT,
   proc { |ability, user, target, move, mults, power, type|
@@ -264,11 +275,13 @@ Battle::AbilityEffects::DamageCalcFromAlly.add(:POWERSPOT,
   }
 )
 
-Battle::AbilityEffects::EndOfRoundEffect.add(:GRASSPELT,
+# Dry Skin
+Battle::AbilityEffects::EndOfRoundEffect.add(:DRYSKIN,
   proc { |ability, battler, battle|
-    if battler.battle.field.terrain == :CorrosiveField
-		battler.pbReduceHP(battler.totalhp / 8, false)
-        battle.pbDisplay(_INTL("{1} is hurt by the corrosion!", battler.pbThis))
+    if battler.battle.field.terrain == :DesertField
+      battle.pbShowAbilitySplash(battler)
+		  battler.pbReduceHP(battler.totalhp / 8, false)
+      battle.pbHideAbilitySplash(battler)
     end
   }
 )
@@ -537,7 +550,8 @@ Battle::AbilityEffects::OnTerrainChange.add(:MIMICRY,
 		    :RockyField      => :ROCK,
 		    :CorrosiveField	 => :POISON,
         :CorrosiveMistField	 => :POISON,
-        :BurningField    => :FIRE
+        :BurningField    => :FIRE,
+        :DesertField    => :GROUND
       }
       new_type = terrain_hash[battle.field.terrain]
       new_type_name = nil

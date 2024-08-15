@@ -499,6 +499,7 @@ Other Moves:
 - Nature Power becomes Flamethrower
 - Secret Power may Burn
 - Terrain Pulse becomes Fire-type
+- Camouflage changes the user's type to Fire
 
 Transitions to Other Fields:
 - This Field will be terminated if Rain is active at the end of the turn or if any of the following moves are used:
@@ -522,20 +523,30 @@ General Effects:
 
 Abilities Affected:
 - Sand Force, Sand Rush, and Sand Veil are activated
+- Dry Skin makes the bearer lose 1/8 max HP each turn
+- Mimicry changes the user's type to Ground
 
 Moves that increase in base power by 1.5x:
-
-
-Moves that increase in base power by 2x:
-
-
-Moves that decrease in base power by 0.5x:
-
-
-Boosted stat-changing moves:
-
+- Burn Up
+- Dig 
+- Needle Arm 
+- Heat Wave 
+- Pin Missile 
+- Sand Tomb 
+- Sandsear Storm 
+- Scald
+- Scorching Sands 
+- Searing Sunraze Smash 
+- Steam Eruption
+- Thousand Waves
+- Bonemerang
+- Bone Club
+- Bone Rush
+- Shadow Bone
 
 Other Moves:
-
-
-Transitions to Other Fields:
+- Sand Tomb deals 1/6 max HP per turn
+- Camouflage changes the user's type to Ground
+- Nature Power becomes Sand Tomb
+- Secret Power may lower Accuracy
+- Terrain Pulse's type becomes Ground
