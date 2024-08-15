@@ -403,6 +403,6 @@ Weather = Sandstorm, 100
 Name = Route 1
 Outdoor = true
 BattleBack = sand
-Weather = Sandstorm,20
+Weather = Sandstorm,100
 ShowArea = true
 SnapEdges = true
