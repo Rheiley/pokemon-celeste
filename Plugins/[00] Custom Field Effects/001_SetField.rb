@@ -55,6 +55,16 @@ module BattleCreationHelperMethods
   module_function
   # Sets up various battle parameters and applies special rules.
   def prepare_battle(battle)
+    electricTerrainArray = []
+    grassyTerrainArray = []
+    mistyTerrainArray = []
+    psychicTerrainArray = []
+    inverseFieldArray = []
+    rockyFieldArray = []
+    corrosiveFieldArray = []
+    corrosiveMistFieldArray = []
+    burningFieldArray = []
+    desertFieldArray = [32, 33]
 #===============================================================================
     battle.defaultWeather = :Rain        if $game_switches[101]
     battle.defaultWeather = :Hail        if $game_switches[102]
@@ -62,16 +72,16 @@ module BattleCreationHelperMethods
     battle.defaultWeather = :Sun         if $game_switches[104]
 #===============================================================================
     #battle.defaultTerrain = :ElectricField     	 if [002].include?($game_map.map_id)
-    battle.defaultTerrain = :ElectricTerrain   		 if $game_switches[121]   # 01
-    battle.defaultTerrain = :GrassyTerrain     		 if $game_switches[122]   # 02
-    battle.defaultTerrain = :MistyTerrain      		 if $game_switches[123]   # 03
-    battle.defaultTerrain = :PsychicTerrain    		 if $game_switches[124]   # 04
-    battle.defaultTerrain = :InverseField      		 if $game_switches[125]   # 05
-    battle.defaultTerrain = :RockyField        		 if $game_switches[126]   # 06
-    battle.defaultTerrain = :CorrosiveField    		 if $game_switches[127]   # 07
-	  battle.defaultTerrain = :CorrosiveMistField    if $game_switches[128]   # 08
-    battle.defaultTerrain = :BurningField          if $game_switches[129]   # 09
-    battle.defaultTerrain = :DesertField           if $game_switches[130]   # 10
+    battle.defaultTerrain = :ElectricTerrain   		 if $game_switches[121] 
+    battle.defaultTerrain = :GrassyTerrain     		 if $game_switches[122] 
+    battle.defaultTerrain = :MistyTerrain      		 if $game_switches[123]   
+    battle.defaultTerrain = :PsychicTerrain    		 if $game_switches[124]   
+    battle.defaultTerrain = :InverseField      		 if $game_switches[125]   
+    battle.defaultTerrain = :RockyField        		 if $game_switches[126]   
+    battle.defaultTerrain = :CorrosiveField    		 if $game_switches[127]   
+	  battle.defaultTerrain = :CorrosiveMistField    if $game_switches[128]   
+    battle.defaultTerrain = :BurningField          if $game_switches[129]   
+    battle.defaultTerrain = :DesertField           if $game_switches[130] || desertFieldArray.include?($game_map.map_id)
 #===============================================================================Need Announcement
     battle.field.effects[PBEffects::FairyLock] = 100         if $game_switches[111]
     battle.field.effects[PBEffects::Gravity] = 100           if $game_switches[112]
@@ -404,7 +414,7 @@ class Battle::Scene
      if @battle.field.terrain != :None
       terrain_data = GameData::BattleTerrain.try_get(@battle.field.terrain)
       fieldName = terrain_data.name
-      root = "Graphics/Fieldbacks/"
+      root = "Graphics/Battlebacks/"
       @sprites["battle_bg"].setBitmap("#{root}/#{fieldName + "_bg"}".downcase) 
       @sprites["base_0"].setBitmap("#{root}/#{fieldName + "_base0"}".downcase) # enemy base
       @sprites["base_1"].setBitmap("#{root}/#{fieldName + "_base1"}".downcase) # player base
