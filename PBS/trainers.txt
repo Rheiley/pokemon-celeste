@@ -44,6 +44,21 @@ Pokemon = NIDORANfE, 5
 #-------------------------------
 
 #-------------------------------
+#	     Mini Bosses
+#-------------------------------
+[MINIBOSS_Exeggutor,Exeggutor]
+Pokemon = EXEGGUTOR, 18
+	Nature = ADAMANT
+	AbilityIndex = 0
+	Gender = Male
+	IV = 20
+	EV = 4,252,252,0,0,0
+	Item = MUSCLEBAND
+	Form = 1
+	Shiny = true
+	Moves = DRAGONHAMMER, SEEDBOMB, BULLDOZE, BODYSLAM
+
+#-------------------------------
 #	   Sidequest Battles
 #-------------------------------
 

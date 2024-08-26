@@ -399,6 +399,9 @@ Gender = Male
 BaseMoney = 100
 BattleBGM = Battle Champion
 VictoryBGM = Battle Victory Leader
+
+# Rivals
+
 #-------------------------------
 [RIVAL_Riley]
 Name = Rival
@@ -415,3 +418,14 @@ BaseMoney = 100
 BattleBGM = Battle Rival
 VictoryBGM = Battle Victory Leader
 SkillLevel = 100
+
+# Mini Bosses
+
+#-------------------------------
+[MINIBOSS_Exeggutor]
+Name = Tall Tree
+Gender = Male
+BaseMoney = 0
+BattleBGM = Battle Upbeat 3
+SkillLevel = 100
+

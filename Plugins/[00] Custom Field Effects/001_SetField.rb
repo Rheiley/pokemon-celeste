@@ -64,7 +64,7 @@ module BattleCreationHelperMethods
     corrosiveFieldArray = []
     corrosiveMistFieldArray = []
     burningFieldArray = []
-    desertFieldArray = [32, 33]
+    desertFieldArray = [32, 33, 42]
 #===============================================================================
     battle.defaultWeather = :Rain        if $game_switches[101]
     battle.defaultWeather = :Hail        if $game_switches[102]
