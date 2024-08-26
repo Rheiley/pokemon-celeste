@@ -55,7 +55,6 @@ Pokemon = EXEGGUTOR, 18
 	EV = 4,252,252,0,0,0
 	Item = MUSCLEBAND
 	Form = 1
-	Shiny = true
 	Moves = DRAGONHAMMER, SEEDBOMB, BULLDOZE, BODYSLAM
 
 #-------------------------------

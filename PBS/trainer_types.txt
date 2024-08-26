@@ -426,6 +426,6 @@ SkillLevel = 100
 Name = Tall Tree
 Gender = Male
 BaseMoney = 0
-BattleBGM = Battle Upbeat 3
+BattleBGM = Battle Mini Boss
 SkillLevel = 100
 
