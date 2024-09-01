@@ -1,4 +1,23 @@
-﻿# See the documentation on the wiki to learn how to edit this file.
+﻿# Celeste Region
+
+[032]   # Arnica Town
+Name = Arnica Town
+Outdoor = true
+BattleBack = desertfield
+ShowArea = true
+SnapEdges = true
+Weather = Sandstorm, 100
+#-------------------------------
+[042]   # Route 1
+Name = Route 1
+Outdoor = true
+BattleBack = desertfield
+Weather = Sandstorm,100
+ShowArea = true
+SnapEdges = true
+Environment = Desert
+
+
 #-------------------------------
 [001]   # Intro
 Name = Intro
@@ -389,20 +408,3 @@ Name = Tiall Region
 Outdoor = true
 MapPosition = 1,13,16
 BattleBack = city
-#--------CELESTE REGION---------
-#-------------------------------
-[032]   # Arnica Town
-Name = Arnica Town
-Outdoor = true
-BattleBack = desertfield
-ShowArea = true
-SnapEdges = true
-Weather = Sandstorm, 100
-#-------------------------------
-[042]   # Route 1
-Name = Route 1
-Outdoor = true
-BattleBack = desertfield
-Weather = Sandstorm,100
-ShowArea = true
-SnapEdges = true

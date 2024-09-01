@@ -35,7 +35,8 @@ GameData::Environment.register({
 GameData::Environment.register({
   :id          => :Grass,
   :name        => _INTL("Grass"),
-  :battle_base => "grass"
+  # :battle_base => "grass"
+  # Commented out because it would override terrain that already had Battlebacks from the desired field effect.
 })
 
 GameData::Environment.register({
