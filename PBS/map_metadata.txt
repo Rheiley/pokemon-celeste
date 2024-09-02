@@ -15,8 +15,6 @@ BattleBack = desertfield
 Weather = Sandstorm,100
 ShowArea = true
 SnapEdges = true
-Environment = Desert
-
 
 #-------------------------------
 [001]   # Intro
