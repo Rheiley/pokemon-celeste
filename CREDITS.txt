@@ -6,4 +6,7 @@ Music:
 - Zame: https://www.youtube.com/@The_Zame
 - Gamefreak
 
-Trainer Sprites & Tilesets - Pokemon Reborn: https://www.rebornevo.com/pr/index.html/, Pokemon Rejuvenation: https://www.rebornevo.com/rejuvenation/
+Trainer Sprites/Tilesets:
+- Pokemon Reborn: https://www.rebornevo.com/pr/index.html/
+- Pokemon Rejuvenation: https://www.rebornevo.com/rejuvenation/
+- Lolw3e932 (Overworld trainer sprites): https://www.deviantart.com/lolw3e932/gallery
