@@ -75,7 +75,7 @@ MidbattleHandlers.add(:midbattle_global, :wild_ultra_battle,
         battle.disablePokeBalls = true
         battle.sosBattle = false if defined?(battle.sosBattle)
         battle.totemBattle = nil if defined?(battle.totemBattle)
-        foe.damageThreshold = 6
+        foe.damageThreshold = 20
         PBDebug.log("[Midbattle Global] #{logname} gains a Z-Powered aura")
         battle.pbAnimation(:DRAGONDANCE, foe, foe)
         battle.pbDisplay(_INTL("{1}'s aura flared to life!", foe.pbThis))
@@ -120,7 +120,7 @@ MidbattleHandlers.add(:midbattle_triggers, "ultraBurst",
     oldMode = battle.wildBattleMode
     battle.wildBattleMode = :ultra if battler.wild? && oldMode != :ultra
     if battle.pbCanUltraBurst?(battler.index)
-	  PBDebug.log("     'ultraBurst': #{battler.name} (#{battler.index}) set to Ultra Burst")
+      PBDebug.log("     'ultraBurst': #{battler.name} (#{battler.index}) set to Ultra Burst")
       battle.scene.pbForceEndSpeech
       battle.pbDisplay(params.gsub(/\\PN/i, battle.pbPlayer.name)) if params.is_a?(String)
       battle.pbUltraBurst(battler.index)
@@ -139,9 +139,9 @@ MidbattleHandlers.add(:midbattle_triggers, "disableUltra",
     side = (battler.opposes?) ? 1 : 0
     owner = battle.pbGetOwnerIndexFromBattlerIndex(idxBattler)
     battle.ultraBurst[side][owner] = (params) ? -2 : -1
-	value = (params) ? "disabled" : "enabled"
-	trainerName = battle.pbGetOwnerName(idxBattler)
-	PBDebug.log("     'disableUltra': Ultra Burst #{value} for #{trainerName}")
+    value = (params) ? "disabled" : "enabled"
+    trainerName = battle.pbGetOwnerName(idxBattler)
+    PBDebug.log("     'disableUltra': Ultra Burst #{value} for #{trainerName}")
   }
 )
 
@@ -259,6 +259,7 @@ class Battle
     return if !battler.hasUltra? || battler.ultra?
     $stats.ultra_burst_count += 1 if battler.pbOwnedByPlayer?
     pbDeluxeTriggers(idxBattler, nil, "BeforeUltraBurst", battler.species, *battler.pokemon.types)
+    @scene.pbAnimateSubstitute(idxBattler, :hide)
     old_ability = battler.ability_id
     if battler.hasActiveAbility?(:ILLUSION)
       Battle::AbilityEffects.triggerOnBeingHit(battler.ability, nil, battler, nil, self)
@@ -273,6 +274,7 @@ class Battle
     battler.pbTriggerAbilityOnGainingIt
     pbCalculatePriority(false, [idxBattler]) if Settings::RECALCULATE_TURN_ORDER_AFTER_MEGA_EVOLUTION
     pbDeluxeTriggers(idxBattler, nil, "AfterUltraBurst", battler.species, *battler.pokemon.types)
+    @scene.pbAnimateSubstitute(idxBattler, :show)
   end
   
   #-----------------------------------------------------------------------------
@@ -346,6 +348,7 @@ class Battle::Battler
   def hasUltra?
     return false if shadowPokemon? || @effects[PBEffects::Transform]
     return false if wild? && ![:zmove, :ultra].include?(@battle.wildBattleMode)
+    return false if @battle.raidBattle? && @battle.raidRules[:style] != :Ultra
     return false if !getActiveState.nil?
     return false if hasEligibleAction?(:primal, :zodiac)
     return false if !@item_id || @item_id != @pokemon&.getUltraItem
@@ -420,8 +423,7 @@ class Battle::Peer
     return if !pkmn
     f = MultipleForms.call("getUnUltraForm", pkmn)
     if f && pkmn.form != f && (endBattle || pkmn.fainted?)
-      pkmn.form_simple = f
-	  pkmn.ability = nil
+      pkmn.makeUnUltra
       pkmn.hp = pkmn.totalhp if pkmn.hp > pkmn.totalhp
     end
   end
@@ -502,10 +504,12 @@ class Pokemon
   def makeUnUltra
     v = MultipleForms.call("getUnUltraForm", self)
     if !v.nil?
-      self.form_simple = v
+      @form = v
     elsif ultra?
-      self.form_simple = 0
+      @form = 0
     end
+    @ability = nil
+    calc_stats
   end
   
   def getUltraForm

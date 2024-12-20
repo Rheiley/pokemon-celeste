@@ -260,8 +260,11 @@ Battle::AbilityEffects::OnBeingHit.add(:WINDPOWER,
 #===============================================================================
 Battle::AbilityEffects::EndOfRoundEffect.add(:CUDCHEW,
   proc { |ability, battler, battle|
+    echoln "Cud Chew Check"
     next if battler.item
+    echoln "Cud Chew Not have item"
     next if !battler.recycleItem || !GameData::Item.get(battler.recycleItem).is_berry?
+    echoln "Cud Chew recycle item"
     case battler.effects[PBEffects::CudChew]
     when 0 # End round after eat berry
       battler.effects[PBEffects::CudChew] += 1
@@ -283,12 +286,12 @@ Battle::AbilityEffects::OnOpposingStatGain.add(:OPPORTUNIST,
     showAnim = true
     battle.pbShowAbilitySplash(battler)
     statUps.each do |stat, increment|
-	  next if !battler.pbCanRaiseStatStage?(stat, battler)
+	    next if !battler.pbCanRaiseStatStage?(stat, battler)
       if battler.pbRaiseStatStage(stat, increment, battler, showAnim)
         showAnim = false
       end
     end
-    battle.pbDisplay(_INTL("{1}'s stats won't go any higher!", user.pbThis)) if showAnim
+    battle.pbDisplay(_INTL("{1}'s stats won't go any higher!", battler.pbThis)) if showAnim
     battle.pbHideAbilitySplash(battler)
     battler.pbItemOpposingStatGainCheck(statUps)
     # Mirror Herb can trigger off this ability.
@@ -356,6 +359,7 @@ Battle::AbilityEffects::OnSwitchIn.add(:COMMANDER,
     showAnim = true
     battler.allAllies.each{|b|
       next if !b || !b.near?(battler) || b.fainted?
+      next if battle.choices[b.index][0] == :SwitchOut
       next if !b.isSpecies?(:DONDOZO)
       next if b.effects[PBEffects::Commander]
       next if defined?(b.dynamax?) && b.dynamax?
@@ -432,22 +436,19 @@ Battle::AbilityEffects::DamageCalcFromUser.add(:ORICHALCUMPULSE,
 Battle::AbilityEffects::OnSwitchIn.add(:HADRONENGINE,
   proc { |ability, battler, battle, switch_in|
     battle.pbShowAbilitySplash(battler)
-	if battle.field.terrain == :ElectricTerrain
-		battle.pbDisplay(_INTL("{1} used the Electric Terrain to energize its futuristic engine!", battler.pbThis))
-		battle.pbHideAbilitySplash(battler)
-	elsif battle.field.terrain == :ElectricField
-		battle.pbDisplay(_INTL("{1} used the Electric Field to energize its futuristic engine!", battler.pbThis))
-		battle.pbHideAbilitySplash(battler)
+    if battle.field.terrain == :Electric
+      battle.pbDisplay(_INTL("{1} used the Electric Terrain to energize its futuristic engine!", battler.pbThis))
+      battle.pbHideAbilitySplash(battler)
     else
-        battle.pbStartTerrain(battler, :ElectricTerrain)
-        battle.pbDisplay(_INTL("{1} turned the ground into Electric Terrain, energizing its futuristic engine!", battler.pbThis))
+      battle.pbStartTerrain(battler, :Electric)
+      battle.pbDisplay(_INTL("{1} turned the ground into Electric Terrain, energizing its futuristic engine!", battler.pbThis))
     end
   }
 )
 
 Battle::AbilityEffects::DamageCalcFromUser.add(:HADRONENGINE,
   proc { |ability, user, target, move, mults, baseDmg, type|
-    mults[:attack_multiplier] *= 4 / 3.0 if move.specialMove? && (user.battle.field.terrain == :ElectricTerrain || user.battle.field.terrain == :ElectricField)
+    mults[:attack_multiplier] *= 4 / 3.0 if move.specialMove? && user.battle.field.terrain == :Electric
   }
 )
 
@@ -458,8 +459,8 @@ Battle::AbilityEffects::OnSwitchIn.add(:PROTOSYNTHESIS,
   proc { |ability, battler, battle, switch_in|
     next if battler.effects[PBEffects::Transform]
     case ability
-    when :PROTOSYNTHESIS then field_check = [:Sun, :HarshSun].include?(battle.field.weather)
-    when :QUARKDRIVE     then field_check = [:ElectricTerrain, :ElectricField].include?(battle.field.terrain)
+    when :PROTOSYNTHESIS then field_check = [:Sun, :HarshSun].include?(battle.pbWeather)
+    when :QUARKDRIVE     then field_check = battle.field.terrain == :Electric
     end
     if !field_check && !battler.effects[PBEffects::BoosterEnergy] && battler.effects[PBEffects::ParadoxStat]
       battle.pbDisplay(_INTL("The effects of {1}'s {2} wore off!", battler.pbThis(true), battler.abilityName))

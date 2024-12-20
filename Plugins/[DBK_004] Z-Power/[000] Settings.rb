@@ -29,7 +29,7 @@ module Settings
   #-----------------------------------------------------------------------------
   # When true, plays the Z-Move animation whenever triggered.
   #-----------------------------------------------------------------------------
-  SHOW_ZMOVE_ANIM = false
+  SHOW_ZMOVE_ANIM = true
   
   #-----------------------------------------------------------------------------
   # When true, plays the Ultra Burst animation whenever triggered.

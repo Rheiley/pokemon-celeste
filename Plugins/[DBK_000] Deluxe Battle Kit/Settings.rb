@@ -13,19 +13,24 @@ module Settings
   SHORTEN_MOVES = true
   
   #-----------------------------------------------------------------------------
+  # When true, Pokemon databoxes will be hidden in battle during move animations.
+  #-----------------------------------------------------------------------------
+  HIDE_DATABOXES_DURING_MOVES = true
+  
+  #-----------------------------------------------------------------------------
   # Allows for different battle music to play when the player's Pokemon is at low HP.
   #-----------------------------------------------------------------------------
-  PLAY_LOW_HP_MUSIC = false
+  PLAY_LOW_HP_MUSIC = true
   
   #-----------------------------------------------------------------------------
   # Toggles the appearance of the Mega Evolution animation used by this plugin.
   #-----------------------------------------------------------------------------
-  SHOW_MEGA_ANIM = false
+  SHOW_MEGA_ANIM = true
   
   #-----------------------------------------------------------------------------
   # Toggles the appearance of the Primal Reversion animation used by this plugin.
   #-----------------------------------------------------------------------------
-  SHOW_PRIMAL_ANIM = false
+  SHOW_PRIMAL_ANIM = true
   
   #-----------------------------------------------------------------------------
   # Sets how the overlay pattern on Shadow Pokemon animates.

@@ -105,12 +105,6 @@ class Battle
   def pbStartWeather(user, newWeather, fixedDuration = false, showAnim = true)
     return if @field.weather == newWeather
     if newWeather == :Hail && Settings::HAIL_WEATHER_TYPE > 0
-      if @field.terrain == :BurningField
-        pbWait(0.5)
-        pbHideAbilitySplash(user) if user
-        pbDisplay(_INTL("The flames melted the snow!"))
-        return
-      end
       @field.weather = newWeather
       duration = (fixedDuration) ? 5 : -1
       if duration > 0 && user && user.itemActive?

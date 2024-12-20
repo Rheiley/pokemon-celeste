@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------------------
 MenuHandlers.add(:debug_menu, :deluxe_zmoves, {
   "name"        => _INTL("Toggle Z-Moves"),
-  "parent"      => :deluxe_plugins_menu,
+  "parent"      => :deluxe_gimmick_toggles,
   "description" => _INTL("Toggles the availability of Z-Move functionality."),
   "effect"      => proc {
     $game_switches[Settings::NO_ZMOVE] = !$game_switches[Settings::NO_ZMOVE]
@@ -16,14 +16,38 @@ MenuHandlers.add(:debug_menu, :deluxe_zmoves, {
   }
 })
 
+MenuHandlers.add(:battle_rules_menu, :noZMoves, {
+  "name"        => "No Z-Moves: [{1}]",
+  "rule"        => "noZMoves",
+  "order"       => 306,
+  "parent"      => :set_battle_rules,
+  "description" => _INTL("Determines which side Z-Moves are disabled for."),
+  "effect"      => proc { |menu|
+    next pbApplyBattleRule("noZMoves", :Choose, [:All, :Player, :Opponent], 
+      _INTL("Choose a side to disable Z-Moves for."))
+  }
+})
+
 MenuHandlers.add(:debug_menu, :deluxe_ultra_burst, {
   "name"        => _INTL("Toggle Ultra Burst"),
-  "parent"      => :deluxe_plugins_menu,
+  "parent"      => :deluxe_gimmick_toggles,
   "description" => _INTL("Toggles the availability of Ultra Burst functionality."),
   "effect"      => proc {
     $game_switches[Settings::NO_ULTRA_BURST] = !$game_switches[Settings::NO_ULTRA_BURST]
     toggle = ($game_switches[Settings::NO_ULTRA_BURST]) ? "disabled" : "enabled"
     pbMessage(_INTL("Ultra Burst {1}.", toggle))
+  }
+})
+
+MenuHandlers.add(:battle_rules_menu, :noUltraBurst, {
+  "name"        => "No Ultra Burst: [{1}]",
+  "rule"        => "noUltraBurst",
+  "order"       => 307,
+  "parent"      => :set_battle_rules,
+  "description" => _INTL("Determines which side Ultra Burst is disabled for."),
+  "effect"      => proc { |menu|
+    next pbApplyBattleRule("noUltraBurst", :Choose, [:All, :Player, :Opponent], 
+      _INTL("Choose a side to disable Ultra Burst for."))
   }
 })
 

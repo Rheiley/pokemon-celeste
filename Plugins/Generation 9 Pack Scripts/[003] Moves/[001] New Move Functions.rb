@@ -227,6 +227,7 @@ class Battle::Move::RaiseUserSpAtkSpDef1CureStatus < Battle::Move::MultiStatUpMo
   end
   
   def pbEffectGeneral(user)
+    super
     user.pbCureStatus if user.pbHasAnyStatus?
   end 
 end
@@ -240,6 +241,41 @@ class Battle::Move::RecoilHalfOfTotalHP < Battle::Move::RecoilMove
   end
 end
 
+#===============================================================================
+# Lowers the target's Speed by 1 stage. Skips accuracy check in rain. 
+# (Bleakwind Storm)
+#===============================================================================
+class Battle::Move::LowerTargetSpeed1AlwaysHitsInRain < Battle::Move::TargetStatDownMove
+  def initialize(battle, move)
+    super
+    @statDown = [:SPEED, 1]
+  end
+  
+  def pbBaseAccuracy(user, target)
+    return 0 if [:Rain, :HeavyRain].include?(target.effectiveWeather)
+    return super
+  end
+end
+
+#===============================================================================
+# May paralyze targets. Skips accuracy check in rain. (Wildbolt Storm)
+#===============================================================================
+class Battle::Move::ParalyzeTargetAlwaysHitsInRain < Battle::Move::ParalyzeTarget
+  def pbBaseAccuracy(user, target)
+    return 0 if [:Rain, :HeavyRain].include?(target.effectiveWeather)
+    return super
+  end
+end
+
+#===============================================================================
+# May burn targets. Skips accuracy check in rain. (Sandsear Storm)
+#===============================================================================
+class Battle::Move::BurnTargetAlwaysHitsInRain < Battle::Move::BurnTarget
+  def pbBaseAccuracy(user, target)
+    return 0 if [:Rain, :HeavyRain].include?(target.effectiveWeather)
+    return super
+  end
+end
 
 ################################################################################
 # 
@@ -715,6 +751,7 @@ end
 #-------------------------------------------------------------------------------
 class Battle::Move::RemoveTerrainIceSpinner < Battle::Move
   def pbEffectGeneral(user)
+    return if user.fainted?
     return if @battle.field.terrain == :None
     case @battle.field.terrain
     when :Electric

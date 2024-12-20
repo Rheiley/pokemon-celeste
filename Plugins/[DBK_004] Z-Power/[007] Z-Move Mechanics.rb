@@ -38,6 +38,10 @@ class GameStats
     return @total_zmove_count - @status_zmove_count
   end
   
+  def wild_zpower_battles_won
+    return @wild_zpower_battles_won || 0
+  end
+  
   def wild_zpower_battles_won=(value)
     @wild_zpower_battles_won = 0 if !@wild_zpower_battles_won
     @wild_zpower_battles_won = value
@@ -84,7 +88,7 @@ MidbattleHandlers.add(:midbattle_global, :wild_zpower_battle,
         battle.disablePokeBalls = true
         battle.sosBattle = false if defined?(battle.sosBattle)
         battle.totemBattle = nil if defined?(battle.totemBattle)
-        foe.damageThreshold = 6
+        foe.damageThreshold = 20
         battle.pbAnimation(:DRAGONDANCE, foe, foe)
         battle.pbDisplay(_INTL("{1}'s aura flared to life!", foe.pbThis))
         showAnim = true
@@ -137,7 +141,7 @@ MidbattleHandlers.add(:midbattle_triggers, "useZMove",
     oldMode = battle.wildBattleMode
     battle.wildBattleMode = :zmove if battler.wild? && oldMode != :zmove
     if battle.pbCanZMove?(battler.index) && battler.hasCompatibleZMove?(ch[2])
-	  PBDebug.log("     'useZMove': #{battler.name} (#{battler.index}) set to use a Z-Move")
+      PBDebug.log("     'useZMove': #{battler.name} (#{battler.index}) set to use a Z-Move")
       battle.scene.pbForceEndSpeech
       battler.display_zmoves
       ch[2] = battler.moves[ch[1]]
@@ -157,9 +161,9 @@ MidbattleHandlers.add(:midbattle_triggers, "disableZMoves",
     side = (battler.opposes?) ? 1 : 0
     owner = battle.pbGetOwnerIndexFromBattlerIndex(idxBattler)
     battle.zMove[side][owner] = (params) ? -2 : -1
-	value = (params) ? "disabled" : "enabled"
-	trainerName = battle.pbGetOwnerName(idxBattler)
-	PBDebug.log("     'disableZMoves': Z-Moves #{value} for #{trainerName}")
+    value = (params) ? "disabled" : "enabled"
+    trainerName = battle.pbGetOwnerName(idxBattler)
+    PBDebug.log("     'disableZMoves': Z-Moves #{value} for #{trainerName}")
   }
 )
 
@@ -337,7 +341,8 @@ class Battle::Battler
   #-----------------------------------------------------------------------------
   def hasZMove?
     return false if shadowPokemon?
-    return false if wild? && @battle.wildBattleMode != :zmove
+    return false if wild? && !(@battle.raidBattle? || @battle.wildBattleMode == :zmove)
+    return false if @battle.raidBattle? && @battle.raidRules[:style] != :Ultra
     return false if ![nil, :ultra].include?(self.getActiveState)
     return false if hasEligibleAction?(:primal, :ultra, :zodiac)
     return hasCompatibleZMove?
@@ -362,6 +367,14 @@ class Battle::Battler
     else
       return moves.any? { |m| m.type == item.zmove_type }
     end
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Utility for checking if a Z-Crystal is held.
+  #-----------------------------------------------------------------------------
+  def hasZCrystal?
+    return false if !@item_id
+    return GameData::Item.get(@item_id).is_zcrystal?
   end
   
   #-----------------------------------------------------------------------------
@@ -464,6 +477,14 @@ class Pokemon
     else
       return @moves.any? { |m| m.type == item.zmove_type }
     end
+  end
+  
+  #-----------------------------------------------------------------------------
+  # Utility for checking if a Z-Crystal is held.
+  #-----------------------------------------------------------------------------
+  def hasZCrystal?
+    return false if !self.item_id
+    return GameData::Item.get(self.item_id).is_zcrystal?
   end
   
   #-----------------------------------------------------------------------------

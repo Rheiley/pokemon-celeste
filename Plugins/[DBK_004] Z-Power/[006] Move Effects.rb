@@ -66,7 +66,7 @@ end
 #-------------------------------------------------------------------------------
 class Battle::ZMove::DamageTargetStartPsychicTerrain < Battle::Move
   def pbAdditionalEffect(user, target)
-    @battle.pbStartTerrain(user, :PsychicTerrain)
+    @battle.pbStartTerrain(user, :Psychic)
   end
 end
 
@@ -77,18 +77,17 @@ end
 #-------------------------------------------------------------------------------
 class Battle::ZMove::DamageTargetRemoveTerrain < Battle::Move
   def pbAdditionalEffect(user, target)
-    # case @battle.field.terrain
-    # when :ElectricTerrain
-    #   @battle.pbDisplay(_INTL("The electricity disappeared from the battlefield."))
-    # when :GrassyTerrain
-    #   @battle.pbDisplay(_INTL("The grass disappeared from the battlefield."))
-    # when :MistyTerrain
-    #   @battle.pbDisplay(_INTL("The mist disappeared from the battlefield."))
-    # when :PsychicTerrain
-    #   @battle.pbDisplay(_INTL("The weirdness disappeared from the battlefield."))
-    # when :InverseField
-    # end
-    @battle.pbStartTerrain(user, :RockyField) if @battle.field.terrain != :RockyField
+    case @battle.field.terrain
+    when :Electric
+      @battle.pbDisplay(_INTL("The electricity disappeared from the battlefield."))
+    when :Grassy
+      @battle.pbDisplay(_INTL("The grass disappeared from the battlefield."))
+    when :Misty
+      @battle.pbDisplay(_INTL("The mist disappeared from the battlefield."))
+    when :Psychic
+      @battle.pbDisplay(_INTL("The weirdness disappeared from the battlefield."))
+    end
+    @battle.field.terrain = :None
   end
   
   def pbShowAnimation(id, user, targets, hitNum = 0, showAnimation = true)

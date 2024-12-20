@@ -30,6 +30,7 @@ class Pokemon
   
   def calcHP(base, level, iv, ev)
     return 1 if base == 1
+    iv = ev = 0 if Settings::DISABLE_IVS_AND_EVS
     return ((((base * 2 + iv + (ev / 4)) * level / 100).floor + level + 10) * hp_boost).ceil
   end
 end
@@ -88,7 +89,9 @@ class Battle::Battler
   # Defines whether the battler is considered a raid boss.
   #-----------------------------------------------------------------------------
   def isRaidBoss?
-    return @pokemon.immunities.include?(:RAIDBOSS)
+    return false if self.idxOwnSide == 0
+    return false if @battle.pbSideBattlerCount(@index) > 1
+    return @pokemon&.immunities.include?(:RAIDBOSS)
   end
   
   #-----------------------------------------------------------------------------
@@ -174,7 +177,7 @@ class Battle::Battler
   alias dx_pbFlinch pbFlinch
   def pbFlinch(_user = nil)
     return false if dynamax?
-    return false if @pokemon.immunities.include?(:FLINCH)
+    return false if @pokemon && @pokemon.immunities.include?(:FLINCH)
     return dx_pbFlinch(_user)
   end
   
@@ -209,7 +212,7 @@ class Battle::Battler
   def takesIndirectDamage?(showMsg = false)
     return false if fainted?
     if @pokemon.immunities.include?(:INDIRECT)
-      @battle.pbDisplay("{1} is completely immune to indirect damage!", pbThis) if showMsg
+      @battle.pbDisplay(_INTL("{1} is completely immune to indirect damage!", pbThis)) if showMsg
       return false
     end
     return dx_takesIndirectDamage?(showMsg)
