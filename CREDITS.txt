@@ -12,3 +12,19 @@ Trainer Sprites/Tilesets:
 - Lolw3e932 (Overworld trainer sprites): https://www.deviantart.com/lolw3e932/gallery
 
 Plugins:
+- Deluxe Battle Kit
+- Enhanced Battle UI
+- Animated Pokemon System
+- [DBK] Z-Power
+- [MUI] Improves Field Skills
+- [MUI] Modular UI Scenes
+- Animated Pokemon Sprites
+- Any Nature Machine
+- Auto Multi Save v21
+- Bag Screen w/ Party
+- Custom Field Effects
+- Delta Speed Up
+- EVs and IVs From Party
+- Generation 9 Pack
+- IV EV Display
+- Level Caps EX
